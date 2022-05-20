@@ -14,7 +14,8 @@ const client = new Client({
     ]
 })
 
-client.login(process.env.TOKEN_CANARY)
+
+client.login(process.env.TOKEN_OFC)
 
    setInterval(async() => { 
 
