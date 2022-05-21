@@ -7,7 +7,7 @@ module.exports = class extends Command {
     constructor(client) {
         super(client, {
             name: 'background',
-            description: 'Minha lojinha de backgrounds'
+            description: '[✨ PROFILE ] Compre backgrounds para seu perfil!'
         })
     }
 

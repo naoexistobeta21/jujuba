@@ -21,7 +21,7 @@ module.exports = class extends Command {
     constructor(client) {
         super(client, {
             name: 'perfil',
-            description: 'Veja seu perfil',
+            description: '[✨ PROFILE ] Veja seu perfil ou de outros usuários!',
             options: [
             {
             type: 'USER',
@@ -35,14 +35,8 @@ module.exports = class extends Command {
 
     run = async (interaction) => {
         interaction.channel.sendTyping()
-        const user = interaction.options.getUser('usuário') || interaction.user;
-        let btc = await bitcoin.findUser(user.id, '968570313027780638')
-
-        //Levels.setURL(config.mongodb);
-        //Levels.createUser(user.id, interaction.guild.id);
-
-        const lvl =  '2' 
-        //await Levels.fetch(user.id, interaction.guild.id, true);
+        let user = interaction.options.getUser('usuário')
+        if(!user) user = interaction.user;
 
         const usac = await User.findOne({
             IdU: user.id
@@ -54,7 +48,7 @@ module.exports = class extends Command {
             const canvas = Canvas.createCanvas(1280, 720)
             const ctx = canvas.getContext("2d")
         
-            let sobmim = usac.profile.sobremim || "Você pode personalizar com /sobremim [texto]"
+            let sobmim = usac.profile.sobremim || "Você pode personalizar com jsobremim [texto]"
                     
             let avatar = user.avatarURL({ dynamic: false, format: "png", size: 1024 });
                     
@@ -65,10 +59,10 @@ module.exports = class extends Command {
             ctx.drawImage(fundo, 0, 0, canvas.width, canvas.height)
             
             const TargetAvatar = await Canvas.loadImage(`${avatar}`)
-            ctx.drawImage(TargetAvatar, 23, 550, 150, 150)
+            ctx.drawImage(TargetAvatar, 30, 25, 120, 120)
     
             let layout = await 
-            Canvas.loadImage("./src/images/profile_glow2.png")
+            Canvas.loadImage("./src/images/profilev5.png")
             ctx.drawImage(layout, 0, 0, canvas.width, canvas.height)
 
             let corNick = '#F8F8F8'
@@ -81,17 +75,17 @@ module.exports = class extends Command {
             ctx.textAlign = "left"
             ctx.font = '48px Segoe UI Black';
             ctx.fillStyle = corNick;
-            await Utils.renderEmoji(ctx, shorten(user.username, 15), 200, 600);
+            await Utils.renderEmoji(ctx, shorten(user.username, 15), 160, 75);
             
             ctx.textAlign = "left"
             ctx.font = '48px Segoe UI Black';
-            ctx.fillStyle = corNick;
-            await Utils.renderEmoji(ctx, shorten(usac.reps, 4), 184, 77);
+            ctx.fillStyle = '#F5022B';
+            await Utils.renderEmoji(ctx, `reps: ${usac.reps}`, 370, 148);
             
             ctx.textAlign = "left"
-            ctx.font = '38px Segoe UI Black';
-            ctx.fillStyle = '#FAA302';
-            await Utils.renderEmoji(ctx, shorten(Utils.toAbbrev(btc.coinsInWallet), 15), 116, 172)
+            ctx.font = '35px Segoe UI Black';
+            ctx.fillStyle = '#2e2d2d';
+            await Utils.renderEmoji(ctx, `#${user.discriminator}`, 160, 110)
                     
             let list = [];
                     
@@ -128,30 +122,25 @@ module.exports = class extends Command {
             .replace("TESTES", '<:TCC_IconBugHunterBadge:879901392779739216>')
             .replace("VIP", "<:vipd:904818002988531762>")
             .replace("GRATIAN", "<:gratian:962487783518273536>")
+
+            ctx.textAlign = "right"
+            ctx.font = `35px "helsinki"`
+            await Utils.renderEmoji(ctx, list.split(",").join(" "), 140, 200);
             
-            ctx.font = `45px "helsinki"`;
-            await Utils.renderEmoji(ctx, list.split(",").join(" "), 200, 675);
-            
-            ctx.font = `25px "indieFlower-Regular"`;
+            ctx.textAlign = "left"
+            ctx.font = `25px "indieFlower-Regular"`; //sobmim
             ctx.fillStyle = '#F8F8F8';
-            ctx.fillText(shorten(sobmim, 70), 610, 600)
-    
-            /*ctx.font = `60px Segoe UI Black`;
-            ctx.fillStyle = '#F8F8F8';
-            ctx.fillText(lvl.position, 585, 570)
-    
-            ctx.font = `60px Segoe UI Black`;
-            ctx.fillStyle = '#F8F8F8';
-            ctx.fillText(shorten(`${lvl.xp}/${Levels.xpFor(lvl.level + 1)}`, 11), 80, 570)*/
+            ctx.fillText(shorten(sobmim, 172), 75, 610)
 
             
-            const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `profile_${user.id}_.png`)
-            return interaction.reply({ content: ` `, files: [attachment]})
+            const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `profilev5${user.id}_.png`)
+            return interaction.reply({ files: [attachment]})
             } catch (err) {
+              console.log(err)
             return interaction.reply({ content: `Não consegui montar o perfil do usuário.`, ephemeral: true})
             }
             } else {
-              return interaction.reply({ content: `Este membro está banido!\nMotivo: \`${usac.Infoban}\``, ephemeral: true})
+              return interaction.reply({ content: `Este membro está banido!`, ephemeral: true})
             }
         } else {
           interaction.reply({ content: 'Este usuário não está registrado em minha database!\nEle precisa usar um comando para registrar na database.', ephemeral: true})
@@ -162,7 +151,6 @@ module.exports = class extends Command {
     }
 
 function shorten(text, len) {
-    if (typeof text !== "string") return "";
     if (text.length <= len) return text;
     return text.substr(0, len).trim() + "...";
   }

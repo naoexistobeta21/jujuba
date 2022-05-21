@@ -9,7 +9,7 @@ module.exports = class extends Command {
     constructor(client) {
         super(client, {
             name: 'rep',
-            description: 'de reputação para usuários.',
+            description: '[✨ PROFILE ] De reputação a usuários!',
             options: [
                 {
                     type: 'USER',

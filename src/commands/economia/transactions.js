@@ -4,6 +4,7 @@ const Trans = require('../../database/Schemas/transactions')
 const Utils = require("../../util/Util")
 const moment = require('moment')
 const ms = require("pretty-ms")
+const Funcao = require('../../../packages/MongoDB/transactions')
 const cooldowns = {}
 
 module.exports = class extends Command {
@@ -11,42 +12,51 @@ module.exports = class extends Command {
         super(client, {
             name: 'transactions',
             description: '[ 🪙 ECONOMIA ] Veja suas transacoes',
+            options: [
+                {
+                    type: 'USER',
+                    name: 'usuário',
+                    description: 'usuário que você vai ver',
+                    required: false
+        },
+            ]
         })
     }
 
     run = async (interaction) => {
         interaction.channel.sendTyping()
+
+        const user = interaction.options.getUser('usuário') || interaction.user;
+
+           const teste = await Funcao.generate(user.id, 15)
+
+           let test = teste.map(i => `${i.transaction}`)
+
+           console.log(test)
+
+           let content = " "
+
+           for(let i = 0;i < teste.length;i++) {
+               if(teste[i]) {
+                content += `<:caramelo:974519013642227732> **|** *${teste[i].transaction}*\n`
+               }
+           }
+
+           const button = new Discord.MessageButton()
+        .setCustomId(`usuarioquemandou${user.id}`)
+        .setLabel(`Transações de ${user.tag}`)
+        .setStyle('SECONDARY')
+        .setDisabled(true)
+
+        const row = new Discord.MessageActionRow().addComponents(button)
         
-        let user = await Trans.findOne({
-        user: interaction.user.id
-        })
-        if(!user) {
-        let date = new Date()
-        let array = [
-        `💸 \`${interaction.user.tag}\` criou o perfil em \`${date}\``
-        ]
-       
-         const novo = new Trans({
-         user: interaction.user.id,
-         transactions: array
-         })
-         novo.save()
-            interaction.reply({ content: '*Parece que você nunca usou o sistema de transações, acabei de criar um perfil para você, use o comando de novo!*', ephemeral: true})
-        } else {
-                let transUser = []
-            let content = " "
-            for(let i = 0;i < 10;i++) {
-                if(user.transactions[i]) {
-                    content += `${user.transactions[i]}\n`
-                }
-            }
-            
+    
             let embed = new Discord.MessageEmbed()
             .setDescription(`${content}`)
-            .setTitle('Suas Transações')
-            .setColor('GREEN')
+            .setTitle(`Histórico de transações [${teste.length}/15]`)
+            .setColor('#FC0388')
             
-            await interaction.reply({ embeds: [embed]})
+            await interaction.reply({ embeds: [embed], components: [row]})
             }
-            }
+            
         }

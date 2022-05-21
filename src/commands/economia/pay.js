@@ -38,12 +38,6 @@ module.exports = class extends Command {
 
     const coinsV = await bitcoin.findUser(user.id, '968570313027780638')
     const coinsU = await bitcoin.findUser(interaction.user.id, '968570313027780638')
-    const transV = await Trans.findOne({
-        user: interaction.user.id
-    })
-    const transU = await Trans.findOne({
-        user: user.id
-    })
     if(user.id === interaction.user.id) return interaction.reply({ content: '*Impossivel enviar bitcoins para se mesmo*', ephemeral: true })
         
      if(coinsU.coinsInWallet < value) {
@@ -62,7 +56,7 @@ module.exports = class extends Command {
 
 
          interaction.reply({
-             content: `${interaction.user}, *para enviar* **${Utils.toAbbrev(value)}** *pro usuário* ${user} *clique no botão* \✅\n\`AVISO: A Equipe do Glow bot não devolve bitcoins depois que é aceito a transação. Também não nos responsabilizamos pelos atos dos usuários envolvidos na transação.\``,
+             content: `${interaction.user}, *para enviar* **${Utils.toAbbrev(value)}** *pro usuário* ${user} *clique no botão* \✅\n\`AVISO: A Equipe da jujuba não devolve caramelos depois que é aceito a transação. Também não nos responsabilizamos pelos atos dos usuários envolvidos na transação.\``,
              components: [row]
          })
          interaction.channel.sendTyping()
@@ -74,14 +68,19 @@ collector.on('collect', async i => {
 	if (i.customId === 'primary') {
     bitcoin.giveCoins(user.id, '968570313027780638', value)
     bitcoin.deductCoins(interaction.user.id, '968570313027780638', value)
-    if(transV) {
-        let arrayTwo = transV.transactions
-        arrayTwo.push(`\`💸 Enviou ${value} caramelos para ${user.tag}\``)
-        await Trans.findOneAndUpdate({
-            user: interaction.user.id,
-            trasactions: arrayTwo
-        })
-    }
+
+    const usuarioT = new Trans({
+        user: user.id,
+        transaction: `<:add:977391516412698705> Recebeu ${Utils.toAbbrev(value)} (${value}) de ${interaction.user.tag}`
+    })
+
+    const usuarioR = new Trans({
+        user: interaction.user.id,
+        transaction: `<:remove:977391516274290699> Enviou ${Utils.toAbbrev(value)} (${value}) para ${user.tag}`
+    })
+
+    usuarioR.save()
+    usuarioT.save()
     
     i.update({ content: `${interaction.user} *enviou* **${Utils.toAbbrev(value)} (\`${value}\`)** *para* ${user}`, components: [] }); //968570313027780638
 	} else if(i.customId === 'cancel') {

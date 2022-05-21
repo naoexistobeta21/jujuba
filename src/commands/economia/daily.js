@@ -10,7 +10,7 @@ module.exports = class extends Command {
     constructor(client) {
         super(client, {
             name: 'daily',
-            description: 'ganhe bitcoins todos os dias.',
+            description: '[ 🪙 ECONOMIA ] Receba caramelos todos os dias!',
         })
     }
 
@@ -27,15 +27,19 @@ module.exports = class extends Command {
         if(daily !== null && timeout - (Date.now() - daily) > 0) {
             let time = ms(timeout - (Date.now() - daily));
         
-        interaction.reply({content: `*Você já coletou seu daily hoje. volte em:* \`${time}\`` })} else {
+        interaction.reply({content: `*Você já coletou seu daily hoje. volte em:* \`${time}\``, ephemeral: true}) } else {
 
-            interaction.reply({content: `*Recompensa diária coletada, \`${random}\` bitcoins*`})
-            let ddd = await User.findOneAndUpdate({
-                IdU: interaction.user.id,
-                daily: Date.now()
-            })
-            
-            db.giveCoins(interaction.user.id,`968570313027780638`, random);
+        const button = new Discord.MessageButton()
+        .setLabel('Resgatar daily')
+        .setStyle('LINK')
+        .setURL('https://jujubawebsite.herokuapp.com/daily')
+    
+            const row = new Discord.MessageActionRow().addComponents(button)
+
+        let embed = new Discord.MessageEmbed()
+        .setColor('#E309A5')
+        .setDescription(`Para pegar seus caramelos diário, acesse [aqui](https://jujubawebsite.herokuapp.com/daily)`)
+        interaction.reply({components: [row]})
 
         }
 

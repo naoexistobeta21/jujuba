@@ -86,9 +86,10 @@ module.exports = class extends Event {
                         repTime: 0
                     })
                     hu.save()
-                    interaction.reply('Você foi registrado na minha database, use o comando novamente!')
+                    interaction.reply({ content: 'Você foi registrado na minha database, use o comando novamente!', ephemeral: true})
                     
                     let commandEmbed = new MessageEmbed()
+                    .setTitle('Novo na database!')
                     .setDescription(`**__User:__** \`${interaction.user.username}\`|\`${interaction.user.id}\`\n**__Guild:__** \`${interaction.guild.name}\`|\`${interaction.guild.id}\``)
                     .setColor('YELLOW')
                     this.client.channels.cache.get('970481305504608256').send({ embeds: [commandEmbed]})

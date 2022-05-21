@@ -2,6 +2,7 @@ const Event = require('../../structures/Event')
 const { MessageEmbed, MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js')
 const Fundo = require('../../database/Schemas/Fundo')
 const Guild = require('../../database/Schemas/Guild')
+const c = require('colors')
 
 module.exports = class extends Event {
     constructor(client) {
@@ -11,10 +12,14 @@ module.exports = class extends Event {
     }
 
     run = async () => {
-        console.log(`Bot ${this.client.user.username} logado com sucesso em ${this.client.guilds.cache.size} servidores.`)
+        console.log(c.green(`[ READY ] - BOT LOGADO COMO `) + c.red(`${this.client.user.tag} `) + c.green('EM ') + c.red(`${this.client.guilds.cache.size} `) + c.green('SERVIDORES'))
         this.client.registryCommands()
         this.client.user.setStatus("online")
-        this.client.user.setActivity(`Adventure time!`, { type: "PLAYING"})
+        if(this.client.user.id === '970134090152034354') {
+            this.client.user.setActivity(`Adventure time!`, { type: "PLAYING"})
+        } else if(this.client.user.id === '960344090241798155') {
+            this.client.user.setActivity(`Vem coisa nova por aí!`, { type: "PLAYING"})
+        }
         const dbIndex = require("../../database/index");
         dbIndex.start();
         

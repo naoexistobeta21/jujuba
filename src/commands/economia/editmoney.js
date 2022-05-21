@@ -36,13 +36,10 @@ module.exports = class extends Command {
         
     const user = interaction.options.getUser('usuário')
     const value = interaction.options.getString('valor')
-    if(isNaN(value)) return interaction.reply({ content: '*Digite um numero válido. exemplo: 1000000*'})
+    if(isNaN(value)) return interaction.reply({ content: '*Digite um numero válido. exemplo: 1000000*', ephemeral: true})
 
     const coinsV = await bitcoin.findUser(user.id, '968570313027780638')
-    const trans = await User.findOne({
-        user: user.id
-    })
-    
+
     const yes = new MessageButton()
     .setCustomId('add')
     .setLabel('ADICIONAR')
@@ -52,19 +49,9 @@ module.exports = class extends Command {
     .setCustomId('remove')
     .setLabel('REMOVER')
     .setStyle('DANGER')
-    
-    const transButton = new MessageButton()
-    .setCustomId('new')
-    .setLabel('NEW PROFILE')
-    .setStyle('PRIMARY')
-    
-    if(trans) {
-        transButton.setDisabled(true)
-    } else {
-        transButton.setDisabled(false)
-    }
 
-    const row = new MessageActionRow().addComponents(yes, no, transButton)
+
+    const row = new MessageActionRow().addComponents(yes, no)
 
 
     interaction.reply({
@@ -84,40 +71,25 @@ collector.on('collect', async i => {
     .setTitle('Relatório de editmoney')
     .setColor('GREEN')
     .setDescription(`*O Admin ${interaction.user.tag} adicionou* **${Utils.toAbbrev(value)}** *caramelos na sua carteira*`)
-    
-    const embedadd2 = new MessageEmbed()
-    .setTitle('Relatório de editmoney')
-    .setColor('GREEN')
-    .setDescription(`*O Admin ${interaction.user.tag} adicionou* **${Utils.toAbbrev(value)}** *caramelos na  carteira de* ${user.tag}`)
-    
-    let array = []
-    
-    for(let i;i < 999;i++) {
-        if(trans.trasactions[i]) {
-            array.push(trans.trasactions[i])
-        }
-    }
-        
-    array.push(`\`🛡️ ${interaction.user.tag} adicionou ${value} caramelos\``)
-    await User.findOneAndUpdate({
+
+    const TransNew = new User({
         user: user.id,
-        transactions: array 
+        transaction: `<:add:977391516412698705> Um admin adicionou - ${Utils.toAbbrev(value)} (${value})`
     })
+    TransNew.save()
 
     try{
         user.send({
         embeds: [embedadd]
     })
     } catch(err) {
-        this.client.channels.cache.get('970481305504608256').send({
-            embeds: [embedadd2]
-        })
+        return console.log('F')
     }
 
     await i.update({ content: `concluído`, components: [] }); //968570313027780638
 	} else if(i.customId === 'remove') {
-     if(value > coinsV) {
-         bitcoin.deductCoins(user.id, '968570313027780638', coinsV)
+     if(value > coinsV.coinsInWallet) {
+         bitcoin.deductCoins(user.id, '968570313027780638', coinsV.coinsInWallet)
      } else {
          bitcoin.deductCoins(user.id, '968570313027780638', value)
      }
@@ -126,33 +98,21 @@ collector.on('collect', async i => {
     .setColor('RED')
     .setDescription(`*O Admin ${interaction.user.tag} removeu* **${Utils.toAbbrev(value)}** *bitcoins da sua carteira*`)
     
-    const embedremove2 = new MessageEmbed()
-    .setTitle('Relatório de editmoney')
-    .setColor('RED')
-    .setDescription(`*O Admin ${interaction.user.tag} removeu* **${Utils.toAbbrev(value)}** *bitcoins da carteira de* ${user.tag}`)
+    const TransNew = new User({
+        user: user.id,
+        transaction: `<:remove:977391516274290699> Um admin removeu - ${Utils.toAbbrev(value)} (${value})`
+    })
+    TransNew.save()
 
     try{
         user.send({
         embeds: [embedremove]
     })
     } catch (err) {
-        this.client.channels.cache.get('970481305504608256').send({
-            embeds: [embedremove2]
-        })
+        return console.log('F')
     }
 
     await i.update({ content: `concluído`, components: [] });
-    } else if(i.customId === 'new') {
-        let date = new Date()
-        let array = [
-            `\`💸 ${interaction.user.tag} criou o perfil de ${user.tag} em ${moment(date).format("dddd, MMMM Do YYYY, HH:mm:ss")}\``
-        ]
-        const TransNew = new User({
-            user: user.id,
-            transactions: array
-        })
-        TransNew.save()
-    await i.update({ content: '*Perfil de usuário criado*', components: []})
     }
 });
 
