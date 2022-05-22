@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 let FundoSchema = new Schema({
-  user: { type: String, default: '1010'},
-  price: { type: Number },
+  user: { type: Number},
+  fundo: { type: Number },
   image: {
       link: String,
       description: String,
@@ -11,5 +11,5 @@ let FundoSchema = new Schema({
   },
 });
 
-const Fundo = mongoose.model("Fundos", FundoSchema);
+const Fundo = mongoose.model("profilebackgrounds", FundoSchema);
 module.exports = Fundo;

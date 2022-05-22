@@ -105,12 +105,13 @@ module.exports = class extends Command {
             if(usac.Premium === 'on') {
               list.push("VIP")
             }
-            if(user.id === '316671069744267267') {
-              list.push("GRATIAN")
+
+            for(let i = 0;i < usac.badges.length;i++) {
+              list.push(`${usac.badges[i]}`)
+              console.log(usac.badges[i])
             }
-            if(user.id === '896226260726976523') {
-              list.push("GRATIAN")
-            }
+
+            
     
             list = list.join("")
             .replace("EARLY_VERIFIED_DEVELOPER", '<:dev:874717224047374417>')
@@ -123,9 +124,9 @@ module.exports = class extends Command {
             .replace("VIP", "<:vipd:904818002988531762>")
             .replace("GRATIAN", "<:gratian:962487783518273536>")
 
-            ctx.textAlign = "right"
+            ctx.textAlign = "left"
             ctx.font = `35px "helsinki"`
-            await Utils.renderEmoji(ctx, list.split(",").join(" "), 140, 200);
+            await Utils.renderEmoji(ctx, list.split(",").join(" "), 30, 200);
             
             ctx.textAlign = "left"
             ctx.font = `25px "indieFlower-Regular"`; //sobmim

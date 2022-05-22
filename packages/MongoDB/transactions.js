@@ -7,7 +7,7 @@ class Transactions {
         if (!amount) throw new TypeError("Please provide the amount of users to show.");
         if (isNaN(amount)) throw new TypeError("Amount must be a number");
 
-        let users = await Collection.find({ user: userId }).sort([['trasaction', 'ascending']]).exec();
+        let users = await Collection.find({ user: userId }).exec();
 
         return users.slice(0, amount);
     }

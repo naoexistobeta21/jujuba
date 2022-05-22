@@ -1,21 +1,32 @@
 //<:bitcoin:970521426224353321>
 
-const Command = require('../../structures/Command')
+const Command = require('./src/structures/Command')
 const bitcoin = require('discord-mongo-currency')
-const Utils = require("../../util/Util")
+const Utils = require("./src/util/Util")
 const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js')
 
 module.exports = class extends Command {
     constructor(client) {
         super(client, {
-            name: 'dashboard',
+            name: 'mute',
             description: '[ 🛡️ ADMIN ] gerencie seu servidor com o painel.',
+            options: [
+                {
+                type: 'USER',
+                name: 'usuário',
+                description: 'usuário que tu vai mutar',
+                required: true
+                }
+                ]
         })
     }
 
     run = async (interaction) => {
         interaction.channel.sendTyping()
-        if(interaction.user.id !== '947856944515936306') return interaction.reply({ content: 'comando em manutenção', ephemeral: true})
+        const user = interaction.options.getUser('usuário')
+        if(interaction.guild.id !== '955133657830555728') return interaction.reply({ content: 'Esse comando é exclusivo do servidor ANGEL\'S', ephemeral: true})
+        if(!user) return interaction.reply({ content: 'Você precisa escolher um usuário antes!', ephemeral: true})
+
         const button = new MessageButton()
         .setCustomId('primary')
         .setLabel('Canal de entrada')
@@ -25,7 +36,7 @@ module.exports = class extends Command {
 
 
          interaction.reply({
-             content: `teste`,
+             content: ``,
              components: [row]
          })
          interaction.channel.sendTyping()

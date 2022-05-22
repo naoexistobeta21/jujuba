@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 let userSchema = new Schema({
   IdU: { type: String },
   IdS: { type: String },
+  badges: { type: Array, default: ["<:caramelo:974519013642227732>"]},
   Premium: { type: String },
   blacklist: { 
       status: { type: Boolean, default: false},

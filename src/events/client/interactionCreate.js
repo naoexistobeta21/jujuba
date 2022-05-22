@@ -3,6 +3,7 @@ const ticketCategories = require('../../util/ticketCategories')
 const { MessageButton, MessageActionRow, MessageEmbed } = require('discord.js')
 const data = require('../../database/Schemas/User')
 const manu = require('../../database/Schemas/Clients')
+const Guild = require('../../database/Schemas/Guild')
 
 module.exports = class extends Event {
     constructor(client) {
@@ -13,88 +14,99 @@ module.exports = class extends Event {
 
     run = async (interaction) => {
         if (interaction.isCommand()) {
-            if (!interaction.guild) return
+            if(this.client.user.id === '960344090241798155' && interaction.channel.id !== '977363339728531457' && interaction.guild.id === '968570313027780638') return interaction.reply({ content: `\🤖 | *Meus comandos só pedem ser utilizados no chat:* <#977363339728531457>`, ephemeral: true})
+            if (!interaction.guild) return;
 
-            const cmd = this.client.commands.find(c => c.name === interaction.commandName)
+            const guilda = await Guild.findOne({ 
+                IdG: interaction.guild.id
+            })
 
-            if (cmd) {
-                if (cmd.requireDatabase) {
-                    interaction.guild.db =
-                        await this.client.db.guilds.findById(interaction.guild.id) ||
-                        new this.client.db.guilds({ _id: interaction.guild.id })
-                }
+            if(!guilda) {
+                let novo = new Guild({
+                    IdG: interaction.guild.id
+                })
+                novo.save()
 
-                let user = await data.findOne({
-                    IdU: interaction.user.id
-                });
-                
-                    let sex = await manu.findOne({
-                        client: this.client.user.id
-                    })
+                interaction.reply({ content: '*Servidor cadastrado na minha database, use o comando novamente!*', ephemeral: true})
+            } else {
 
-                if(user) {
-                    if(sex) {
-                        if(sex.manu === 'true') {
-                            if(interaction.user.id !== '947856944515936306') {
-                            interaction.reply({ content: `✨ *No momento meus comandos estão em manutenção, tente novamente mais tarde.*`, ephemeral: true})
-                        } else {
-                            cmd.run(interaction)
-                        }
-                        } else {
-                        if(user.blacklist.status === true) return interaction.reply({ content: 'Você está banido!', ephemeral: true}) 
-                        cmd.run(interaction)
-                        
-                        let content = " "
-                        
-                        for(let i = 0;i < 10;i++) {
-                            if(interaction.options._hoistedOptions[i]) {
-                                content += `#${i} [ ${interaction.options._hoistedOptions[i].name} ] - ${interaction.options._hoistedOptions[i].value}\n`
-                            }
-                        }
-                        
-                        let canal_commands = this.client.channels.cache.get('975842505788653578')
-                        let embed = new MessageEmbed()
-                        .setDescription(`**__Usuário:__** *${interaction.user.tag}* | \`${interaction.user.id}\`\n**__Servidor:__** *${interaction.guild.name}* | \`${interaction.guild.id}\`\n**__Comando:__** */${cmd.name}*\n**__Options:__** \n${content}`)
-                        .setColor('#FF0000')
-                        
-                        canal_commands.send({ embeds: [embed]})
+                const cmd = this.client.commands.find(c => c.name === interaction.commandName)
+
+                if (cmd) {
+    
+                    let user = await data.findOne({
+                        IdU: interaction.user.id
+                    });
                     
-                        }
-                        
-                } else {
-                    let manos = new manu({
-                            client: this.client.user.id,
-                            manu: 'false',
-                            reason: 'preguiça'
+                        let sex = await manu.findOne({
+                            client: this.client.user.id
                         })
-                        manos.save()
-                        interaction.reply('client registrado com sucesso, use o comando de novo.')
-                }
-                } else {
-                    let hu = new data({
-                        IdU: interaction.user.id,
-                        IdS: interaction.guild.id,
-                        blacklist: {
-                            status: false,
-                            time: 0,
-                            motivo: 'nenhum'
-                        },
-                        Premium: 'off',
-                        daily: 0,
-                        work: 0,
-                        vip: 0,
-                        repTime: 0
-                    })
-                    hu.save()
-                    interaction.reply({ content: 'Você foi registrado na minha database, use o comando novamente!', ephemeral: true})
-                    
-                    let commandEmbed = new MessageEmbed()
-                    .setTitle('Novo na database!')
-                    .setDescription(`**__User:__** \`${interaction.user.username}\`|\`${interaction.user.id}\`\n**__Guild:__** \`${interaction.guild.name}\`|\`${interaction.guild.id}\``)
-                    .setColor('YELLOW')
-                    this.client.channels.cache.get('970481305504608256').send({ embeds: [commandEmbed]})
+    
+                    if(user) {
+                        if(sex) {
+                            if(sex.manu === 'true') {
+                                if(interaction.user.id !== '947856944515936306') {
+                                interaction.reply({ content: `✨ *No momento meus comandos estão em manutenção, tente novamente mais tarde.*`, ephemeral: true})
+                            } else {
+                                cmd.run(interaction)
+                            }
+                            } else {
+                            if(user.blacklist.status === true) return interaction.reply({ content: 'Você está banido!', ephemeral: true}) 
+                            cmd.run(interaction)
+                            
+                            let content = " "
+                            
+                            for(let i = 0;i < 10;i++) {
+                                if(interaction.options._hoistedOptions[i]) {
+                                    content += `#${i} [ ${interaction.options._hoistedOptions[i].name} ] - ${interaction.options._hoistedOptions[i].value}\n`
+                                }
+                            }
+                            
+                            let canal_commands = this.client.channels.cache.get('975842505788653578')
+                            let embed = new MessageEmbed()
+                            .setDescription(`**__Usuário:__** *${interaction.user.tag}* | \`${interaction.user.id}\`\n**__Servidor:__** *${interaction.guild.name}* | \`${interaction.guild.id}\`\n**__Comando:__** */${cmd.name}*\n**__Options:__** \n${content}`)
+                            .setColor('#FF0000')
+                            
+                            canal_commands.send({ embeds: [embed]})
+                        
+                            }
+                            
+                    } else {
+                        let manos = new manu({
+                                client: this.client.user.id,
+                                manu: 'false',
+                                reason: 'preguiça'
+                            })
+                            manos.save()
+                            interaction.reply('client registrado com sucesso, use o comando de novo.')
+                    }
+                    } else {
+                        let hu = new data({
+                            IdU: interaction.user.id,
+                            IdS: interaction.guild.id,
+                            blacklist: {
+                                status: false,
+                                time: 0,
+                                motivo: 'nenhum'
+                            },
+                            Premium: 'off',
+                            daily: 0,
+                            work: 0,
+                            vip: 0,
+                            repTime: 0
+                        })
+                        hu.save()
+                        interaction.reply({ content: 'Você foi registrado na minha database, use o comando novamente!', ephemeral: true})
+                        
+                        let commandEmbed = new MessageEmbed()
+                        .setTitle('Novo na database!')
+                        .setDescription(`**__User:__** \`${interaction.user.username}\`|\`${interaction.user.id}\`\n**__Guild:__** \`${interaction.guild.name}\`|\`${interaction.guild.id}\``)
+                        .setColor('YELLOW')
+                        this.client.channels.cache.get('970481305504608256').send({ embeds: [commandEmbed]})
+                    }
                 }
             }
+
         } else if (interaction.isButton()) {
             
             if(interaction.customId === 'ligarmanu') {

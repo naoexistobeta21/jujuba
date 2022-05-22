@@ -2,10 +2,9 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 let GuildSchema = new Schema({
-  _id: { type: String },
   IdG: { type: String },
   infoban: { type: String, default: 'nenhum'},
-  ownerid: { type: String },
+  ownerid: { type: String, default: '3243' },
   chat: { type: String, default: 'off'},
   Prefix: { type: String, default: 'n!'},
   antilink: { type: String, default: 'off'},

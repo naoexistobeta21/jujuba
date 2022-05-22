@@ -30,10 +30,6 @@ module.exports = class extends Command {
 
            const teste = await Funcao.generate(user.id, 15)
 
-           let test = teste.map(i => `${i.transaction}`)
-
-           console.log(test)
-
            let content = " "
 
            for(let i = 0;i < teste.length;i++) {
