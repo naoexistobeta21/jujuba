@@ -1,14 +1,10 @@
 const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js')
-
-module.exports = (client, interaction) => {
+const t = require('./functions/gifs.js')
+module.exports = async (client, interaction) => {
     const user = interaction.options.getUser('usuário')
 
     if(user.bot) return interaction.reply({ content: 'Não posso deixar que você faça isso, pois pode machucar sua mãozinha <3', ephemeral: true})
     if(user.id === interaction.user.id) return interaction.reply({ content: 'Vai se tratar ok ?', ephemeral: true})
-
-    let images = [
-        "https://64.media.tumblr.com/821efef2f7125c9f362d7391c1414ba8/tumblr_pzkh6mHF4B1slcujao3_500.gif",
-    ]
 
     const button = new MessageButton()
         .setCustomId(`slap${user.id}`)
@@ -18,7 +14,7 @@ module.exports = (client, interaction) => {
 
     const row = new MessageActionRow().addComponents(button)
 
-    let responseImage = images[Math.floor(Math.random() * images.length)]
+    let responseImage = await t.slap()
     const embed = new MessageEmbed()
     .setDescription(`<:jujuba_slap:977854296773230624> **| ${interaction.user} deu um tapa em ${user}!**`)
     .setImage(responseImage)
@@ -26,12 +22,11 @@ module.exports = (client, interaction) => {
     interaction.reply({ content: `${user}`, embeds: [embed], components: [row] })
 
     const filter = i => i.user.id === i.user.id;
-         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 40000 });
+         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 120000 });
 
 collector.on('collect', async i => {
-    if(i.user.id !== user.id) {
-        i.reply({ content: 'Você não pode usar esse botão!', ephemeral: true})
-    }
+    if(i.user.id !== user.id) return i.reply({ content: 'Você não pode usar esse botão!', ephemeral: true})
+    
 	if (i.customId === `slap${user.id}`) {
         let response = images[Math.floor(Math.random() * images.length)]
         const embed = new MessageEmbed()
@@ -44,6 +39,6 @@ collector.on('collect', async i => {
 	}
 });
 
-collector.on('end', collected => { return interaction.editReply({ components: []})});
+collector.on('end', collected => {});
      
 }

@@ -4,7 +4,9 @@ const { MessageButton, MessageActionRow, MessageEmbed } = require('discord.js')
 const data = require('../../database/Schemas/User')
 const manu = require('../../database/Schemas/Clients')
 const Guild = require('../../database/Schemas/Guild')
+const Discord = require('discord.js')
 
+const coins = require('discord-mongo-currency')
 module.exports = class extends Event {
     constructor(client) {
         super(client, {
@@ -13,177 +15,68 @@ module.exports = class extends Event {
     }
 
     run = async (interaction) => {
+        if(interaction.isButton()) {
+            if(interaction.customId === 'playAdv') {
+                let c = await coins.findUser(interaction.user.id, '968570313027780638')
+                if(c.coinsInWallet >= 2000) {
+                    const embed = new MessageEmbed().setTitle('Mochila de porções').setDescription(`> Veneno\n> Explosão de Tinta\n> Laxante\n> Aleatório`).setColor('RED')
+                    const veneno = new MessageButton().setLabel('Usar veneno').setStyle('PRIMARY').setCustomId('veneninhobb')
+                    interaction.reply({ embeds: [embed], ephemeral: true})
+                    this.client.adv.addPlayer(interaction, interaction.user.id)
+                } else {
+                    interaction.reply({ content: 'Você precisa de pelo menos 2,000 caramelos para entrar!', ephemeral: true})
+                }
+            }
+        }
         if (interaction.isCommand()) {
-            if(this.client.user.id === '960344090241798155' && interaction.channel.id !== '977363339728531457' && interaction.guild.id === '968570313027780638') return interaction.reply({ content: `\🤖 | *Meus comandos só pedem ser utilizados no chat:* <#977363339728531457>`, ephemeral: true})
+            if(this.client.user.id === '960344090241798155' && interaction.channel.id !== '977363339728531457') return interaction.reply({ content: `\🤖 | *Meus comandos só pedem ser utilizados no chat:* <#977363339728531457>`, ephemeral: true})
             if (!interaction.guild) return;
 
             const guilda = await Guild.findOne({ 
-                IdG: interaction.guild.id
+                server: interaction.guild.id
             })
 
+            let user = await data.findOne({
+                user: interaction.user.id
+            });
+            
             if(!guilda) {
-                let novo = new Guild({
-                    IdG: interaction.guild.id
+                    let novo = new Guild({
+                        server: interaction.guild.id
+                    })
+    
+                    novo.save()
+    
+                    interaction.reply({ content: '*Servidor cadastrado na minha database, use o comando novamente!*', ephemeral: true})
+                } else
+            if(!user) {
+                let hu = new data({
+                    user: interaction.user.id,
                 })
-                novo.save()
 
-                interaction.reply({ content: '*Servidor cadastrado na minha database, use o comando novamente!*', ephemeral: true})
+                hu.save()
+                interaction.reply({ content: 'Você foi registrado na minha database, use o comando novamente!', ephemeral: true})
+           
             } else {
-
+                this.t = await this.client.getTranslate(interaction.guild.id)
                 const cmd = this.client.commands.find(c => c.name === interaction.commandName)
 
                 if (cmd) {
-    
-                    let user = await data.findOne({
-                        IdU: interaction.user.id
-                    });
+                if(user.status.blacklist.status === true) return interaction.reply({ content: 'Você está banido!', ephemeral: true}) 
                     
-                        let sex = await manu.findOne({
-                            client: this.client.user.id
-                        })
-    
-                    if(user) {
-                        if(sex) {
-                            if(sex.manu === 'true') {
-                                if(interaction.user.id !== '947856944515936306') {
-                                interaction.reply({ content: `✨ *No momento meus comandos estão em manutenção, tente novamente mais tarde.*`, ephemeral: true})
-                            } else {
-                                cmd.run(interaction)
+                    try {
+                  cmd.run(interaction, this.t)
+                        } catch (err) {
+                            interaction.reply({ content: `Olá, aconteceu algum erro ao executar o comando,\n\`\`\`\n${err}\`\`\``})
                             }
-                            } else {
-                            if(user.blacklist.status === true) return interaction.reply({ content: 'Você está banido!', ephemeral: true}) 
-                            cmd.run(interaction)
-                            
-                            let content = " "
-                            
-                            for(let i = 0;i < 10;i++) {
-                                if(interaction.options._hoistedOptions[i]) {
-                                    content += `#${i} [ ${interaction.options._hoistedOptions[i].name} ] - ${interaction.options._hoistedOptions[i].value}\n`
-                                }
-                            }
-                            
-                            let canal_commands = this.client.channels.cache.get('975842505788653578')
-                            let embed = new MessageEmbed()
-                            .setDescription(`**__Usuário:__** *${interaction.user.tag}* | \`${interaction.user.id}\`\n**__Servidor:__** *${interaction.guild.name}* | \`${interaction.guild.id}\`\n**__Comando:__** */${cmd.name}*\n**__Options:__** \n${content}`)
-                            .setColor('#FF0000')
-                            
-                            canal_commands.send({ embeds: [embed]})
+                    console.log(`User: ${interaction.user.tag} (${interaction.user.id}) guild: ${interaction.guild.name} (${interaction.guild.id}) Comando: ${cmd.name}`)
                         
                             }
-                            
-                    } else {
-                        let manos = new manu({
-                                client: this.client.user.id,
-                                manu: 'false',
-                                reason: 'preguiça'
-                            })
-                            manos.save()
-                            interaction.reply('client registrado com sucesso, use o comando de novo.')
-                    }
-                    } else {
-                        let hu = new data({
-                            IdU: interaction.user.id,
-                            IdS: interaction.guild.id,
-                            blacklist: {
-                                status: false,
-                                time: 0,
-                                motivo: 'nenhum'
-                            },
-                            Premium: 'off',
-                            daily: 0,
-                            work: 0,
-                            vip: 0,
-                            repTime: 0
-                        })
-                        hu.save()
-                        interaction.reply({ content: 'Você foi registrado na minha database, use o comando novamente!', ephemeral: true})
-                        
-                        let commandEmbed = new MessageEmbed()
-                        .setTitle('Novo na database!')
-                        .setDescription(`**__User:__** \`${interaction.user.username}\`|\`${interaction.user.id}\`\n**__Guild:__** \`${interaction.guild.name}\`|\`${interaction.guild.id}\``)
-                        .setColor('YELLOW')
-                        this.client.channels.cache.get('970481305504608256').send({ embeds: [commandEmbed]})
-                    }
-                }
             }
-
-        } else if (interaction.isButton()) {
             
-            if(interaction.customId === 'ligarmanu') {
-                if(interaction.user.id !== '947856944515936306') return interaction.reply({ content: 'Você não tem permisão para usar esse botão.', ephemeral: true})
-                let embed = new MessageEmbed()
-                .setColor('RED')
-                .setDescription('Comandos em manutenção')
+
                 
-                this.client.channels.cache.get('974585001486221332').send({ embeds: [embed]})
-                interaction.reply({ content: 'Comandos adicionados na manutenção', ephemeral: true})
-                
-                await manu.findOneAndUpdate({
-                        client: this.client.user.id,
-                   		manu: 'true'
-                    })
-            } else if(interaction.customId === 'desligarmanu') {
-                if(interaction.user.id !== '947856944515936306') return interaction.reply({ content: 'Você não tem permisão para usar esse botão.', ephemeral: true})
-                let embed = new MessageEmbed()
-                .setColor('GREEN')
-                .setDescription('Comandos voltaram ao normal.')
-                
-                this.client.channels.cache.get('974585001486221332').send({ embeds: [embed]})
-                interaction.reply({ content: 'Comandos removidos da manutenção', ephemeral: true})
-                
-                await manu.findOneAndUpdate({
-                        client: this.client.user.id,
-                   		manu: 'false'
-                    })
-            }
-            /*if (interaction.customId.startsWith('openTicket')) {
-                const categoryID = interaction.customId.split('-')[1]
-                const category = ticketCategories.find(c => c.id === categoryID)
-
-                const channel = await interaction.guild.channels.create(`${category.name}-${interaction.user.username}`, {
-                    type: 'GUILD_TEXT',
-                    parent: category.id,
-                    topic: `ticket-${category.name}-${interaction.user.id}`,
-                    permissionOverwrites: [
-                        {
-                            id: interaction.guild.id,
-                            deny: ['VIEW_CHANNEL']
-                        },
-                        {
-                            id: interaction.user.id,
-                            allow: ['VIEW_CHANNEL', 'SEND_MESSAGES', 'READ_MESSAGE_HISTORY', 'ATTACH_FILES', 'EMBED_LINKS', 'ADD_REACTIONS']
-                        },
-                        {
-                            id: category.staffRole,
-                            allow: ['VIEW_CHANNEL', 'SEND_MESSAGES', 'READ_MESSAGE_HISTORY', 'ATTACH_FILES', 'EMBED_LINKS', 'ADD_REACTIONS']
-                        }
-                    ]
-                })
-
-                interaction.reply({ content: `Seu ticket foi aberto com sucesso no canal ${channel.toString()}!`, ephemeral: true })
-
-                const deleteButton = new MessageButton()
-                    .setLabel('Fechar ticket')
-                    .setEmoji('❌')
-                    .setCustomId('closeTicket')
-                    .setStyle('DANGER')
-                const row = new MessageActionRow().addComponents(deleteButton)
-
-                channel.send({ content: interaction.user.toString(), embeds: [category.embed], components: [row] })
-            } else if (interaction.customId === 'closeTicket') {
-                interaction.message.edit({
-                    content: interaction.message.content,
-                    embeds: interaction.message.embeds,
-                    components: [
-                        new MessageActionRow().addComponents(interaction.message.components[0].components[0].setDisabled())
-                    ]
-                })
-
-                interaction.reply('O ticket será fechado em 20 segundos.')
-
-                setTimeout(() => interaction.channel.delete(), 20000)
-            }
-            */
+                            
         }
     }
 }

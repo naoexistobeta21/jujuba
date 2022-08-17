@@ -3,4 +3,12 @@ package-lock.json/
 .env/
 index.js/
 src/index.js/
-src/database/
+Shard.js/
+sus.png/
+layout_ship.png/
+helsinki.ttf/
+IndieFlower-Regular.ttf/
+bot.zip/
+games/
+api/
+packages/

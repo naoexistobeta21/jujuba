@@ -1,6 +1,6 @@
 const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js')
-
-module.exports = (client, interaction) => {
+const t = require('./functions/gifs.js')
+module.exports = async (client, interaction) => {
     const user = interaction.options.getUser('usuário')
 
     if(user.bot) return interaction.reply({ content: 'um bot não tem sentimentos', ephemeral: true})
@@ -18,7 +18,7 @@ module.exports = (client, interaction) => {
 
     const row = new MessageActionRow().addComponents(button)
 
-    let responseImage = images[Math.floor(Math.random() * images.length)]
+    let responseImage = await t.hug()
     const embed = new MessageEmbed()
     .setDescription(`<a:jujuba_dance:977848862331011072> **| ${interaction.user} abraçou ${user}!**`)
     .setImage(responseImage)
@@ -26,12 +26,11 @@ module.exports = (client, interaction) => {
     interaction.reply({ content: `${user}`, embeds: [embed], components: [row] })
 
     const filter = i => i.user.id === i.user.id;
-         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 40000 });
+         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 120000 });
 
 collector.on('collect', async i => {
-    if(i.user.id !== user.id) {
-        i.reply({ content: 'Você não pode usar esse botão!', ephemeral: true})
-    }
+    if(i.user.id !== user.id) return i.reply({ content: 'Você não pode usar esse botão!', ephemeral: true})
+    
 	if (i.customId === `hug${user.id}`) {
         let response = images[Math.floor(Math.random() * images.length)]
         const embed = new MessageEmbed()
@@ -44,6 +43,6 @@ collector.on('collect', async i => {
 	}
 });
 
-collector.on('end', collected => { return interaction.editReply({ components: []})});
+collector.on('end', collected => {});
      
 }

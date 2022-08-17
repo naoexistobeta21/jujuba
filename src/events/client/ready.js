@@ -3,7 +3,8 @@ const { MessageEmbed, MessageActionRow, MessageSelectMenu, MessageButton } = req
 const Fundo = require('../../database/Schemas/Fundo')
 const Guild = require('../../database/Schemas/Guild')
 const c = require('colors')
-
+const { AdventureTime } = require('../../../games/adventureTime')
+const { Player } = require('../../../games/players')
 module.exports = class extends Event {
     constructor(client) {
         super(client, {
@@ -12,37 +13,32 @@ module.exports = class extends Event {
     }
 
     run = async () => {
-        console.log(c.green(`[ READY ] - BOT LOGADO COMO `) + c.red(`${this.client.user.tag} `) + c.green('EM ') + c.red(`${this.client.guilds.cache.size} `) + c.green('SERVIDORES'))
         this.client.registryCommands()
         this.client.user.setStatus("online")
-        if(this.client.user.id === '970134090152034354') {
-            this.client.user.setActivity(`Adventure time!`, { type: "PLAYING"})
-        } else if(this.client.user.id === '960344090241798155') {
-            this.client.user.setActivity(`Vem coisa nova por aí!`, { type: "PLAYING"})
-        }
+        
         const dbIndex = require("../../database/index");
         dbIndex.start();
+
+        this.client.guilds.cache.forEach((guild) => {
+            this.client.user.setActivity(`Adventure Time! Cluster ${this.client.cluster.id} [${guild.shardId}]`, { type: "PLAYING", shardId: guild.shardId }) 
+        })
+
+        setInterval(() => {
+            this.client.guilds.cache.forEach((guild) => {
+                this.client.user.setActivity(`Adventure Time! Cluster ${this.client.cluster.id} [${guild.shardId}]`, { type: "PLAYING", shardId: guild.shardId }) 
+            })
+        }, 20 * 60000)
+/*
+        let players = []
+        let channel = this.client.channels.cache.get('1003321650307153960')
         
-        if(this.client.user.id === '970134090152034354') {
-            const button = new MessageButton()
-        .setCustomId('ligarmanu')
-        .setLabel('ON')
-        .setStyle('SUCCESS')
-        
-        const button2 = new MessageButton()
-        .setCustomId('desligarmanu')
-        .setLabel('OFF')
-        .setStyle('DANGER')
-
-        const row = new MessageActionRow().addComponents(button, button2)
-
-
-         this.client.channels.cache.get('974576802959880192').send({
-             content: `https://cdn.discordapp.com/attachments/967120262510297141/974582449214480404/static.png`,
-             components: [row]
-         })
-        this.client.channels.cache.get('974576802959880192').bulkDelete(5)
-        }
-
+        if(channel) {
+            this.client.adv = new AdventureTime(players, channel)
+            await this.client.adv.start(channel)
+            setInterval(async () => {
+                await this.client.adv.next(channel)
+                await this.client.adv.start(channel)
+            }, 60000 * 18) //1080000
+        }*/
     }
 }

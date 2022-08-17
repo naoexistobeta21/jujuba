@@ -1,54 +1,26 @@
 require('dotenv').config()
-
+const Discord = require('discord.js')
 const Client = require('./src/structures/Client')
+const fs = require('fs')
+const User = require('./src/database/Schemas/User')
+const Guild = require('./src/database/Schemas/Guild')
+const Cluster = require('discord-hybrid-sharding');
+const axios = require('axios')
+const intents = new Discord.Intents(32767)
+
 
 const client = new Client({
-    intents: [
-        'GUILDS',
-        'GUILD_MESSAGE_REACTIONS',
-        'GUILD_MESSAGES',
-        'GUILD_INVITES',
-        'GUILD_VOICE_STATES',
-        'GUILD_MEMBERS',
-        'GUILD_PRESENCES'
-    ]
+    shards: Cluster.data.SHARD_LIST, // An array of shards that will get spawned
+    shardCount: Cluster.data.TOTAL_SHARDS,
+    intents
 })
 
-
+client.cluster = new Cluster.Client(client);
 client.login(process.env.TOKEN_CANARY)
 
-   setInterval(async() => { 
-
-      let channel = await client.channels.cache.get('971956917029183488') //coloque o id do canal para contar os membros!
-    
-      const user = client.users.cache.size
-     
-      channel.setName(`Users: ${user}`)
-
-     let guildchannel = await client.channels.cache.get('971957032842330122') //coloque o id do canal para contar servidores.
-    
-      const guilds = client.guilds.cache.size
-     
-      guildchannel.setName(`Guilds: ${guilds}`)
-       
-       let guildsschannel = await client.channels.cache.get('971957214917062656') //coloque o id do canal para contar servidores.
-    
-      const ping = client.ws.ping
-     
-      guildsschannel.setName(`Ping: ${Math.round(ping)}ms`)
-    
-     }, 900000)
 
 const cfonts = require('cfonts');
-const banner = cfonts.render((`GRATIAN`), {
-    font: 'block',
-    color: 'candy',
-    align: 'left',
-    gradient: ["red", "white"],
-    lineHeight: 3
-});
 
-console.log(banner.string);
 
 process.on('unhandledRejection', (reason, p) => {
         console.log(' [ ANTICLASH ] | SCRIPT REJEITADO');
@@ -73,6 +45,9 @@ process.on('multipleResolves', (type, promise, reason) => {
 //OTYwMzQ0MDkwMjQxNzk4MTU1.GnSqSY.9n7uByWIV-WF5h7veTH_cbPrLeCXDE-R7gd-GY
 
 //OTcwMTM0MDkwMTUyMDM0MzU0.Ym3hxw.-XcdNjaabHYKchcfgJxXJAZk9dM
+
 module.exports = {
   Util: require("./src/util/index.js"),
+  client: client
 };
+

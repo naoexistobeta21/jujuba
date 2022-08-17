@@ -6,12 +6,8 @@ module.exports = {
   start() {
     try {
       
-      mongoCurrency.connect('mongodb+srv://admin:admin@cluster0.uc0cy.mongodb.net/banksarty?retryWrites=true&w=majority');
-      console.log(c.red('[ ECONOMIA ] - SISTEMA CARREGADO'))
-
-      mongoose.connect('mongodb+srv://admin:admin@cluster0.uc0cy.mongodb.net/banksarty?retryWrites=true&w=majority');
-
-      console.log(c.red(`[ MONGODB ] - CONECTADO A DATABASE.`));
+      mongoCurrency.connect(process.env.MONGO_URI);
+      mongoose.connect(process.env.MONGO_URI);
     } catch (err) {
       if (err) return console.log(c.red(`[ MONGODB ] - ERROR:`, +err));
     }

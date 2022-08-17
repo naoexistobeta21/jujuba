@@ -2,6 +2,8 @@ const { Client } = require('discord.js')
 
 const { readdirSync } = require('fs')
 const { join } = require('path')
+const Locale = require('../../packages/Locale')
+const Guild = require('../database/Schemas/Guild')
 
 //const Models = require('../database/models/Models')
 
@@ -12,15 +14,19 @@ module.exports = class extends Client {
         super(options)
 
         this.commands = []
+        this.logs = []
         this.loadCommands()
         this.loadEvents()
     }
 
+    
+
     registryCommands() {
-        // temporária
-        //this.guilds.cache.get('968570313027780638').commands.set(this.commands)
+        //this.guilds.forEach(guild => guild.commands.set(this.commands))
         this.application.commands.set(this.commands)
     }
+
+
 
     loadCommands(path = 'src/commands') {
         const categories = readdirSync(path)
@@ -36,7 +42,6 @@ module.exports = class extends Client {
             }
         }
     }
-
     loadEvents(path = 'src/events') {
         const categories = readdirSync(path)
 
@@ -51,4 +56,52 @@ module.exports = class extends Client {
             }
         }
     }
-}
+
+    async getLanguage(firstGuild) {
+        if (!firstGuild) return;
+        const guild = await Guild.findOne({
+          server: firstGuild,
+        });
+    
+        if (guild) {
+          let lang = guild.botconfig.language;
+    
+          if (lang === undefined) {
+            guild.botconfig.language = "portuguese";
+            guild.save();
+    
+            return "portuguese";
+          } else {
+            return lang;
+          }
+        } else {
+          await Guild.create({ server: firstGuild });
+    
+          return "portuguese";
+        }
+      }
+    
+      async getActualLocale() {
+        return this.t;
+      }
+    
+      async setActualLocale(locale) {
+        this.t = locale;
+      }
+    
+      async getTranslate(guild) {
+        const language = await this.getLanguage(guild);
+    
+        const translate = new Locale("src/languages");
+    
+        const t = await translate.init({
+          returnUndefined: false,
+        });
+    
+        translate.setLang(language);
+    
+        return t;
+      }
+
+    }
+    

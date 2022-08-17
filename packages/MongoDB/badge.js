@@ -6,7 +6,7 @@ class Badges {
         if(!badge) throw new Error('VOCÊ NÃO DEFINIU A PORRA DA BADGE SEU FDP')
         if(!user) throw new Error('VOCÊ ESQUECEU DE DEFINIR O USER OK ?')
 
-        const verificar = await Collection.findOne({ IdU: user.id})
+        const verificar = await Collection.findOne({ user: user.id})
 
         if(verificar.badges.includes(badge)) return interaction.reply({ content: 'O Usuário já tem essa badge!', ephemeral: true})
 
@@ -18,6 +18,7 @@ class Badges {
             }
         }
 
+        array.push(badge)
         verificar.badges = array
 
         verificar.save()

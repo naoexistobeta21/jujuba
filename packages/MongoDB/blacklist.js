@@ -7,12 +7,12 @@ class Blacklist {
       if(!user) return console.error("Você precisa definir o user!")
 
       const usuar = await User.findOne({ 
-          IdU: user.id
+          user: user.id
     })
 
     if(!usuar) return i.update({ content: 'Usuário não esta na minha database!', components: [], ephemeral: true})
-    if(usuar.blacklist.status === true) return i.update({ content: 'O Usuário já está banido!', components: [], ephemeral: true})
-    usuar.blacklist.status = true
+    if(usuar.status.blacklist.status === true) return i.update({ content: 'O Usuário já está banido!', components: [], ephemeral: true})
+    usuar.status.blacklist.status = true
 
           
     let embedadd = new Discord.MessageEmbed()
@@ -35,13 +35,13 @@ try{
     if(!user) return console.error("Você precisa definir o user!")
 
     const usuari = await User.findOne({ 
-        IdU: user.id
+        user: user.id
   })
 
   if(!usuari) return i.update({ content: 'Usuário não esta na minha database!', components: [], ephemeral: true})
-  if(usuari.blacklist.status === false) return i.update({ content: 'O Usuário não está banido!', components: [], ephemeral: true})
+  if(usuari.status.blacklist.status === false) return i.update({ content: 'O Usuário não está banido!', components: [], ephemeral: true})
 
-  usuari.blacklist.status = false
+  usuari.status.blacklist.status = false
 
   let embedremove = new Discord.MessageEmbed()
         .setTitle('Você foi desbanido!')

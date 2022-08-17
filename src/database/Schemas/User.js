@@ -2,43 +2,114 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 let userSchema = new Schema({
-  IdU: { type: String },
-  IdS: { type: String },
-  badges: { type: Array, default: ["<:caramelo:974519013642227732>"]},
-  Premium: { type: String },
-  blacklist: { 
-      status: { type: Boolean, default: false},
-      time: { type: Number, default: new Date() },
+  user: { type: String },
+  server: { type: String },
+  commands: { type: Number, default: 0 },
+  invites: {
+    total: { type: Number, default: 0},
+    real: {type: Number, default: 0},
+    leave: { type: Number, default: 0},
+    fake: { type: Number, default: 0}
+  },
+  ships: { type: Array, default: []},
+  roleplay: {
+    hug: {
+      recebido: {type: Number, default: 0},
+      enviado: {type: Number, default: 0},
+    },
+    slap: {
+      recebido: {type: Number, default: 0},
+      enviado: {type: Number, default: 0},
+    },
+    kiss: {
+      recebido: {type: Number, default: 0},
+      enviado: {type: Number, default: 0},
+    },
+    attack: {
+      recebido: {type: Number, default: 0},
+      enviado: {type: Number, default: 0},
+    },
+    dance: {
+      recebido: {type: Number, default: 0},
+      enviado: {type: Number, default: 0},
+    }
+  },
+  badges: { type: Array, default: ["CARAMELO"]},
+  conflip: {
+    joins: { type: Number, default: 0 },
+    wins: { type: Number, default: 0 },
+    over: { type: Number, default: 0},
+    valueWin: { type: Number, default: 0 },
+    valueOver: { type: Number, default: 0 },
+    total: {type: Number, default: 0},
+  },
+  status: { 
+    premium: {
+      status: {type: Boolean, default: false},
+      type: {type: String, default: 'false'}
+    },
+    blacklist: { 
+      status: { type: Boolean, default: false },
+      time: { type: Number, default: Date.now() },
       motivo: { type: String, default: 'nada ainda'}
   },
-  perm: { type: Boolean, default: false },
-  reps: {type: Number, default: 0},
-  daily: { type: Number, default: 0 },
-  work: { type: Number, default: 0 },
-  vip: { type: Number, default: 0 },
-  repTime: { type: Number, default: 0 },
-  backgrounds: {
-        back_01: { type: String, default: 'off' },
-        back_02: { type: String, default: 'off' },
-        back_03: { type: String, default: 'off'}
+   staff: { 
+     perm: { type: Boolean, default: false },
+     level: { type: Number, default: 0 }
     },
+    afk: {
+      status: { type: Boolean, default: false },
+      message: { type: String, default: 'Sem motivo especificado'}
+     },
+   },
+  profile: {
+  backgrounds: { type: Array, default: []},
+  reps: {
+    count: {type: Number, default: 0},
+    time: {type: Number, default: 0},
+    myReps: {type: Array, default: []},
+  },
+  daily: {
+    count: {type: Number, default: 0},
+    time: {type: Number, default: 0},
+   },
+  safeTheEarth: { 
+    count: {type: Number, default: 0},
+    time: {type: Number, default: 0},
+   },
+  vip: { 
+    count: {type: Number, default: 0},
+    time: {type: Number, default: 0},
+   },
   marry: {
     status: { type: String },
     parent: { type: String },
-    time: { type: Date, default: new Date() },
-    kidOne: { type: String },
-    kidTwo: { type: String },
-    kidThree: { type: String },
+    time: { type: Number, default: Date.now() },
+    kid: {
+      name: { type: String, default: 'nenhum' },
+      idade: { type: Number, default: 0 },
+      sexo: { type: String, default: 'nenhum' },
+    },
+    kidTwo: {
+      name: { type: String, default: 'nenhum' },
+      idade: { type: Number, default: 0 },
+      sexo: { type: String, default: 'nenhum' },
+    },
+    kidVip: {
+      name: { type: String, default: 'nenhum' },
+      idade: { type: Number, default: 0 },
+      sexo: { type: String, default: 'nenhum' },
+    },
   },
-  profile: {
-    background: { type: String, default: 'https://cdn.discordapp.com/attachments/886351055456194571/886351745117220894/images.png'},
-    sobremim: { type: String, default: 'Para personalizar use /user sobremim [texto]'},
+  layout: {
+    background: { type: String, default: 'https://cdn.discordapp.com/attachments/967464112961499236/970923337733791794/unknown.png'},
+    sobremim: { type: String, default: 'Para personalizar use jsobremim [texto]'},
   },
-  Infoban: { type: String },
-  afk: { type: String },
-  afkMessage: { type: String },
-  ticket: { type: String },
-  message: { type: String, default: 0 }
+  },
+  ticket: {
+    count: {type: Boolean, default: false},
+  },
+  message: { type: Number, default: 0 }
 });
 
 const User = mongoose.model("Users", userSchema);
