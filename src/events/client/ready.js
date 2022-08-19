@@ -1,7 +1,4 @@
 const Event = require('../../structures/Event')
-const { MessageEmbed, MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js')
-const Fundo = require('../../database/Schemas/Fundo')
-const Guild = require('../../database/Schemas/Guild')
 const c = require('colors')
 const { AdventureTime } = require('../../../games/adventureTime')
 const { Player } = require('../../../games/players')

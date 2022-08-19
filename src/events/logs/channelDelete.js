@@ -1,6 +1,4 @@
 const Event = require('../../structures/Event')
-const Money = require('discord-mongo-currency')
-const Discord = require('discord.js')
 const { AuditLOG } = require('../../../packages/Webhook')
 const Guild = require('../../database/Schemas/Guild')
 

@@ -18,6 +18,7 @@ module.exports = class extends Event {
     if(message.channel.type !== 'GUILD_TEXT') return;
     if(message.content === `${this.client.user}`) return getResponse(message, this.client)
 
+    /*
     const db = await Guild.findOne({ server: message.guild.id })
     if(db?.botconfig.antilink.status) {
     const https = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
@@ -49,6 +50,7 @@ module.exports = class extends Event {
 
     
     }
+    */
   }
 
 } 

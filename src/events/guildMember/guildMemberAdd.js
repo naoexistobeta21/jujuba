@@ -13,6 +13,8 @@ module.exports = class extends Event {
 
         const guild = await Guild.findOne({ server: member.guild.id })
 
+        if(!guild) return;
+        if(!guild.botconfig) return;
         if(guild.botconfig) {
             if(guild.botconfig.welcome.status === true) {
                 const channel = this.client.channels.cache.get(guild.botconfig.welcome.channel)

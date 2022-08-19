@@ -5,10 +5,6 @@ const { join } = require('path')
 const Locale = require('../../packages/Locale')
 const Guild = require('../database/Schemas/Guild')
 
-//const Models = require('../database/models/Models')
-
-//const erelaManager = require('./Manager')
-
 module.exports = class extends Client {
     constructor(options) {
         super(options)

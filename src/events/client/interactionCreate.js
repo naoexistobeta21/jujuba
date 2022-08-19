@@ -1,10 +1,7 @@
 const Event = require('../../structures/Event')
-const ticketCategories = require('../../util/ticketCategories')
 const { MessageButton, MessageActionRow, MessageEmbed } = require('discord.js')
 const data = require('../../database/Schemas/User')
-const manu = require('../../database/Schemas/Clients')
 const Guild = require('../../database/Schemas/Guild')
-const Discord = require('discord.js')
 
 const coins = require('discord-mongo-currency')
 module.exports = class extends Event {

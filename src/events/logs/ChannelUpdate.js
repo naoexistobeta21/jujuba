@@ -1,6 +1,4 @@
 const Event = require('../../structures/Event')
-const Money = require('discord-mongo-currency')
-const Discord = require('discord.js')
 const { AuditLOG } = require('../../../packages/Webhook')
 const Guild = require('../../database/Schemas/Guild')
 
@@ -28,7 +26,8 @@ module.exports = class extends Event {
             GUILD_DIRECTORY: 'Diretório'
         }
 
-        log.send({title: 'Canal editado!', description: `**__Tipo:__** ${types[oldChannel.type] ? types[oldChannel.type] : 'unknown'} => ${types[newChannel.type] ? types[newChannel.type] : 'unknown'}\n**__Nome:__** ${oldChannel.name} => ${newChannel.name} (${oldChannel.id})\n**__Tópico:__** ${oldChannel.topic ? oldChannel.topic : 'Ser feliz'} => ${newChannel.topic ? newChannel.topic : 'Ser feliz'}`, color: 'BLUE'})
+        if(oldChannel.type !== newChannel.type) log.send({title: 'Canal editado!', description: `**__Nome:__** ${newChannel.name} (${newChannel.id})\n**__Tipo:__** ${types[oldChannel.type] ? types[oldChannel.type] : 'unknown'} => ${types[newChannel.type] ? types[newChannel.type] : 'unknown'}`, color: 'BLUE'})
+        
         }
 
     }

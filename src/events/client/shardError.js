@@ -1,8 +1,5 @@
 const Event = require('../../structures/Event')
 const Discord = require('discord.js')
-const Fundo = require('../../database/Schemas/Fundo')
-const Guild = require('../../database/Schemas/Guild')
-const c = require('colors')
 
 module.exports = class extends Event {
     constructor(client) {
