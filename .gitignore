@@ -1,5 +1,13 @@
-*.json
 node_modules/
 games/
 api/
 packages/
+*.json
+*.ttf
+*.png
+images/
+languages/
+prefixcommands/
+util/
+database/
+beta/

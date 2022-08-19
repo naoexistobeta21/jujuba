@@ -1,9 +1,0 @@
-{
-    "caramelos": {
-        "usertem": "<:caramelo:974519013642227732> **| Você tem {{coinsAbb}} (`{{coinsV}}`) caramelos**"
-    },
-    "lang": {
-        "nopermission": "Você não tem permisão de administrador para usar este comando!",
-        "islang": "Este servidor já está em português!"
-    }
-}
