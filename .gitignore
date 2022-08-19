@@ -1,14 +1,6 @@
+.env/
 node_modules/
 package-lock.json/
-.env/
-index.js/
-src/index.js/
-Shard.js/
-sus.png/
-layout_ship.png/
-helsinki.ttf/
-IndieFlower-Regular.ttf/
-bot.zip/
 games/
 api/
 packages/
