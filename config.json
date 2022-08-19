@@ -1,5 +1,0 @@
-{
-    "TOKEN_OFC": "token",
-    "TOKEN_CANARY": "token",
-    "MONGO_URI": "mongodb+srv://admin:jujuba@cluster0.uc0cy.mongodb.net/banksarty?retryWrites=true&w=majority"
-}

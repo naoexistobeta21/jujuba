@@ -1,5 +1,5 @@
 //require('os').cpus().length;
-
+const config = require('./config.json')
 const Cluster = require('discord-hybrid-sharding');
 
 const manager = new Cluster.Manager(`${__dirname}/index.js`, {
@@ -7,7 +7,7 @@ const manager = new Cluster.Manager(`${__dirname}/index.js`, {
     shardsPerClusters: 1,
     totalClusters: 1,
     mode: 'process',
-    token: process.env.TOKEN_CANARY,
+    token: config.TOKEN_CANARY,
 });
 
 
