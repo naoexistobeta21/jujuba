@@ -1,12 +1,8 @@
-require('dotenv').config()
-const Discord = require('discord.js')
+const { Intents } = require('discord.js')
 const Client = require('./src/structures/Client')
-const fs = require('fs')
-const User = require('./src/database/Schemas/User')
-const Guild = require('./src/database/Schemas/Guild')
+const config = require('./config.json')
 const Cluster = require('discord-hybrid-sharding');
-const axios = require('axios')
-const intents = new Discord.Intents(32767)
+const intents = new Intents(32767)
 
 
 const client = new Client({
@@ -16,7 +12,7 @@ const client = new Client({
 })
 
 client.cluster = new Cluster.Client(client);
-client.login(process.env.TOKEN_CANARY)
+client.login(config.TOKEN_CANARY)
 
 
 const cfonts = require('cfonts');
@@ -41,10 +37,6 @@ process.on('multipleResolves', (type, promise, reason) => {
         console.log(' [ ANTICLASH ] | VÁRIOS ERROS');
         console.log(type, promise, reason);
     });
-
-//OTYwMzQ0MDkwMjQxNzk4MTU1.GnSqSY.9n7uByWIV-WF5h7veTH_cbPrLeCXDE-R7gd-GY
-
-//OTcwMTM0MDkwMTUyMDM0MzU0.Ym3hxw.-XcdNjaabHYKchcfgJxXJAZk9dM
 
 module.exports = {
   Util: require("./src/util/index.js"),
