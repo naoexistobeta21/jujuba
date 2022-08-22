@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 const Event = require('../../structures/Event')
 const Guild = require('../../database/Schemas/Guild')
+const shell = require('shelljs');
 module.exports = class extends Event {
 
    constructor(client) {
@@ -16,6 +17,15 @@ module.exports = class extends Event {
     run = async (message) => {
 
     if(message.channel.type !== 'GUILD_TEXT') return;
+
+    if(message.content === 'restart' && message.author.id === '947856944515936306') {
+        await message.reply({ content: '<:minerva_laser:1000173416734785748> Aplicando atualizações...\n<:bmo_what:1000167953368625235> **Obs:** isso pode demorar um pouco até que seja concluído.'})
+        shell.exec('pm2 restart all')
+    } else if(message.content === 'kill' && message.author.id === '947856944515936306') {
+        await message.reply({ content: '<:minerva_laser:1000173416734785748> Desligando...'})
+        shell.exec('pm2 kill')
+    }
+
     if(message.content === `${this.client.user}`) return getResponse(message, this.client)
 
     /*

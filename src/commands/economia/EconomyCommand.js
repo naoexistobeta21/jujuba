@@ -18,6 +18,21 @@ module.exports = class extends Command {
                     name: 'daily',
                     description: '[🪙 ECONOMIA ] Pegue caramelos diários.',
                 },
+                {
+                    type: 'SUB_COMMAND',
+                    name: 'top',
+                    description: '[🪙 ECONOMIA ] Veja a lista de caramelos',
+                    options: [
+                        {
+                            type: 'NUMBER',
+                            name: 'page',
+                            description: 'Qual é a pagina?',
+                            required: false,
+                            maxValue: 2,
+                            minValue: 1
+                        }
+                    ]
+                },
 {
                     
     type: 'SUB_COMMAND',

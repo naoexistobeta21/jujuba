@@ -63,3 +63,7 @@ node cluster.js
     "randostrings": "^0.1.6",
     "translate": "^1.4.1"
 ```
+
+```
+eu sei, a maioria é desnecessária mas eu fiquei com preguiça de excluir, desculpa kkk
+```
