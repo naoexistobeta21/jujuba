@@ -38,8 +38,5 @@ process.on('multipleResolves', (type, promise, reason) => {
         console.log(type, promise, reason);
     });
 
-module.exports = {
-  Util: require("./src/util/index.js"),
-  client: client
-};
+exports.client = client
 

@@ -2,6 +2,7 @@ const Discord = require("discord.js");
 const Event = require('../../structures/Event')
 const Guild = require('../../database/Schemas/Guild')
 const shell = require('shelljs');
+const bot = require('../../../index')
 module.exports = class extends Event {
 
    constructor(client) {
@@ -18,49 +19,27 @@ module.exports = class extends Event {
 
     if(message.channel.type !== 'GUILD_TEXT') return;
 
-    if(message.content === 'restart' && message.author.id === '947856944515936306') {
-        await message.reply({ content: '<:minerva_laser:1000173416734785748> Aplicando atualizações...\n<:bmo_what:1000167953368625235> **Obs:** isso pode demorar um pouco até que seja concluído.'})
-        shell.exec('pm2 restart all')
-    } else if(message.content === 'kill' && message.author.id === '947856944515936306') {
-        await message.reply({ content: '<:minerva_laser:1000173416734785748> Desligando...'})
-        shell.exec('pm2 kill')
-    }
-
-    if(message.content === `${this.client.user}`) return getResponse(message, this.client)
-
-    /*
-    const db = await Guild.findOne({ server: message.guild.id })
-    if(db?.botconfig.antilink.status) {
-    const https = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
-    const noHttps = /^[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/
-    const https2 = /^https?:\/\/?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
-    const http = /^http?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
-    const http2 = /^http?:\/\/?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
-    const teste1 = https.test(message.content)
-    const teste2 = noHttps.test(message.content)
-    const teste3 = https2.test(message.content)
-    const teste4 = http.test(message.content)
-    const teste5 = http2.test(message.content)
-
-    if(true === false) {
-        if(teste1 || teste2 || teste3 || teste4 || teste5) {
-            try{
-                message.delete()
-            } catch (err) {
-                return;
-            }
-        } else if(message.content.includes('http://') || message.content.includes('https://')) {
-            try{
-                message.delete()
-            } catch (err) {
-                return;
-            }
+    let funcs = {
+        restart: {
+            command: 'pm2 restart all',
+            start: shell.exec
+        },
+        kill:  {
+            command: 'pm2 kill',
+            start: shell.exec
         }
     }
 
-    
+    if(message.author.id === '947856944515936306' && funcs[message.content] && this.client.user.id === '960344090241798155') {
+        funcs[message.content].start(funcs[message.content].command)
     }
-    */
+
+    let arr = [
+        `<@${this.client.user.id}>`,
+        `<@!${this.client.user.id}>`
+    ]
+
+    if(arr.includes(message.content)) return getResponse(message, this.client)
   }
 
 } 
@@ -74,26 +53,21 @@ async function getResponse(message, client) {
         .setURL(`https://top.gg/bot/${client.user.id}`)
 
         let button2 = new Discord.MessageButton()
-        .setLabel('Como Configurar?')
+        .setLabel('Como Usar?')
         .setStyle('PRIMARY')
         .setCustomId('config')
-if(teste1 || teste2 || teste3 || teste4 || teste5) {
-        try{
-            message.delete()
-        } catch (err) {
-            return;
-        }
-    } else if(message.content.includes('http://') || message.content.includes('https://')) {
-        try{
-            message.delete()
-        } catch (err) {
-            return;
-        }
-    }
+
+        let cc = `**Comandos:**\n`
+
+        bot.client.commands.forEach(async (cmd) => {
+            cc += ` \`${cmd.name}\` `
+        })
+
         let row = new Discord.MessageActionRow().addComponents(button, button2)
         let embed = new Discord.MessageEmbed()
-        .setDescription(`<:pb_attaboi:1000167758564167702> Estou disponivél em [Slash Commands](https://support.discord.com/hc/pt-br/articles/1500000368501-Slash-Commands-FAQ), use \`/help\`!`)
+        .setDescription(`<:pb_attaboi:1000167758564167702> Estou disponivél em [Slash Commands](https://support.discord.com/hc/pt-br/articles/1500000368501-Slash-Commands-FAQ), use \`/help\`!\n\n${cc}`)
         .setColor('DARK_VIVID_PINK')
+        .setFooter({ text: 'cada comando tem seus sub comandos, exemplo: /user avatar'})
         return message.reply({ embeds: [embed], components: [row]}).then((msg) => {
 
             const filter = user => user
@@ -101,12 +75,7 @@ if(teste1 || teste2 || teste3 || teste4 || teste5) {
 
             collector.on('collect', (i) => {
                 if(i.user !== message.author) return i.reply({ content: 'Sai daqui, isso não é pra você!', ephemeral: true})
-
-                let emb = new Discord.MessageEmbed()
-                .setTitle('Docs')
-                .setDescription(`Ainda não tenho um jeito de configurar, você pode usar \`/moderator dashboard\``)
-                .setColor('RED')
-                i.reply({ embeds: [emb], ephemeral: true })
+                i.reply({ files: ['https://assets-global.website-files.com/5f9072399b2640f14d6a2bf4/628572088b1d3cf52023fc2a_11111_command-picker.png'], ephemeral: true })
             })
             setTimeout(() => {
                 msg.delete()
