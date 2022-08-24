@@ -1,9 +1,10 @@
 const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js')
 const Discord = require("discord.js")
 const Command = require('../../structures/Command')
-const db = require('discord-mongo-currency')
+const db = require('../../../packages/economy')
 const User = require('../../database/Schemas/User')
 const Utils = require("../../util/Util")
+const { format } = require('../../../packages/calc')
 const ms = require("pretty-ms")
 const cooldowns = {}
 
@@ -44,7 +45,7 @@ module.exports = async (client, interaction) => {
         .setColor('#fa05a8')
 
         let Rewarded = new MessageEmbed()
-        .setDescription(`<:wumpus_corao:991799564858294364> Você ganhou ${random} no daily reward, volte em 24 horas!\n<:emoji_23:989282906834870282> Quer mais caramelos? use o comando \`/premium buy\``)
+        .setDescription(`<:wumpus_corao:991799564858294364> Você ganhou **${format(random)}** no daily reward, volte em 24 horas!\n<:emoji_23:989282906834870282> Quer mais caramelos? use o comando \`/premium buy\``)
         .setColor('#fa05a8')
 
         await interaction.reply({ embeds: [editado], components: [row]})
@@ -54,7 +55,7 @@ module.exports = async (client, interaction) => {
 
             collector.on('collect', async (i) => {
                 if (i.customId === `DailyReward${interaction.user.id}`) {
-                    db.giveCoins(interaction.user.id, '968570313027780638', random)
+                    await db.add(interaction.user, random)
                     user.profile.daily.time = Date.now()
                     user.save()
                     i.update({ embeds: [Rewarded], components: []})

@@ -41,14 +41,15 @@ module.exports = class extends Command {
     options: [
         {
             type: 'USER',
-            name: 'usuário',
+            name: 'user',
             description: 'Qual usuário você quer pagar?',
             required: true
         },
         {
             type: 'NUMBER',
-            name: 'valor',
+            name: 'value',
             description: 'Qual o valor?',
+            minValue: 10,
             required: true
         }
     ]

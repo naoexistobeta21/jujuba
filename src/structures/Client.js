@@ -18,7 +18,6 @@ module.exports = class extends Client {
     
 
     registryCommands() {
-        //this.guilds.forEach(guild => guild.commands.set(this.commands))
         this.application.commands.set(this.commands)
     }
 

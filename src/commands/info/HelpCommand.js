@@ -22,10 +22,10 @@ module.exports = class extends Command {
 
     run = async (interaction) => {
         let command = interaction.options.getString('command')
-
+        
         if(!command) {
             let cmds = ` `
-            bot.client.commands.forEach((cmd => {
+            this.client.commands.forEach((cmd => {
                 let subcommands = {}
                 if(cmd.options) {
                     let sub = cmd.options.filter(c => c.type === 'SUB_COMMAND')
