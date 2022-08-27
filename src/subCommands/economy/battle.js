@@ -1,15 +1,15 @@
 const { MessageEmbed, MessageButton, MessageActionRow} = require('discord.js')
 const Command = require('../../structures/Command')
-const bitcoin = require('discord-mongo-currency')
+const bitcoin = require('../../../packages/economy')
 const Utils = require("../../util/Util")
 const User = require('../../database/Schemas/User')
 module.exports = async (client, interaction, t) => {
         let verificar = false
         let max = interaction.options.getNumber('maximo')
         let value = interaction.options.getNumber('valor')
-        let authorCoins = await bitcoin.findUser(interaction.user.id, '968570313027780638')
+        let authorCoins = await bitcoin.view(interaction.user)
         let authorUser = await User.findOne({ user: interaction.user.id})
-        if(authorCoins.coinsInWallet < value) return interaction.reply({ content: 'Você não tem caramelos suficientes!', ephemeral: true})
+        if(authorCoins.normal < value) return interaction.reply({ content: 'Você não tem caramelos suficientes!', ephemeral: true})
         if(!max) max = 30
 let participantes = []
 let participantesy = []
@@ -44,9 +44,9 @@ let content = " "
 collector.on('collect', async (i) => {
 let user = i.user
 if(i.customId === `join${interaction.user.id}`) {
-let isCoins = await bitcoin.findUser(user.id, '968570313027780638')
-if(isCoins.coinsInWallet < value) return i.reply({ content: 'Você não tem caramelos suficientes!', ephemeral: true})
-bitcoin.deductCoins(user.id, '968570313027780638', value)
+let isCoins = await bitcoin.view(user)
+if(isCoins.normal < value) return i.reply({ content: 'Você não tem caramelos suficientes!', ephemeral: true})
+bitcoin.remove(user, value)
 if(participantes.includes(user.id)) return i.reply({ content: 'Você não pode entrar de novo na batalha!', ephemeral: true})
 participantes.push(user.id)
 participantesy.push(user)
@@ -72,12 +72,12 @@ if(verificar === true) {
         console.log(ganhador)
         for(let i = 0; i < participantes.length; i++) {
          if(participantes[i] !== ganhador) {
-            bitcoin.deductCoins(participantes[i], '968570313027780638', value)
+            bitcoin.remove(client.users.cache.get(participantes[i]), value)
          }
          
         }
 
-        bitcoin.giveCoins(ganhador, '968570313027780638', premio)
+        bitcoin.add(client.users.cache.get(ganhador), premio)
          interaction.channel.send({ content: `\🎉 | <@${ganhador}> ganhou ${Utils.toAbbrev(premio)} (${premio}) caramelhos patrocinado por ${interaction.user} e ${participantes.length - 1} perderam ${Utils.toAbbrev(value)} (${value}) caramelos!`})
         
     } else {

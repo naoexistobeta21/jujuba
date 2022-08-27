@@ -63,7 +63,7 @@ module.exports = class extends Command {
                     
     type: 'SUB_COMMAND',
     name: 'background',
-    description: '[✨ PROFILE ] Mude/edit/buy seus backgrounds!',
+    description: '[✨ PROFILE ] edit/buy seus backgrounds!',
 },
 {
                     

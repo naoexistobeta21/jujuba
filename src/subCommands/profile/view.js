@@ -21,7 +21,11 @@ registerFont('Segoe UI Black.ttf', { family: 'Segoe UI Black'})
 
 module.exports = async (client, interaction, t) => {
 
-        interaction.reply({ content: '<a:Load:991154788714692678> Montando profile...'})
+      let embed = new MessageEmbed()
+      .setDescription('<a:Load:991154788714692678> Montando profile...')
+      .setColor('DARK_VIVID_PINK')
+      .setFooter({ text: 'Pode demorar um pouco.'})
+      await interaction.reply({ embeds: [embed]})
         
         
         
@@ -36,18 +40,16 @@ module.exports = async (client, interaction, t) => {
             const ctx = canvas.getContext("2d")
                     
             let avatar = user.displayAvatarURL({ dynamic: false, format: "png", size: 1024 });
-
-            let ii = usac.profile.layout.background
-            if(isNaN(usac.profile.layout.background)) ii = 1
                     
-            let a = `./src/images/backgrounds/back_0${ii}.jpg`
-            if(!a) a = './src/images/backgrounds/padrao.png'
+            let a = 'https://i.imgur.com/mAuJOud.png'
+            if(usac) a = usac.profile.layout.background
+            if(!a.includes('https') || !a.includes('http')) a = 'https://i.imgur.com/mAuJOud.png'
             let fundo = await 
             Canvas.loadImage(a)
             ctx.drawImage(fundo, 0, 0, canvas.width, canvas.height)
             
             const TargetAvatar = await Canvas.loadImage(`${avatar}`)
-            ctx.drawImage(TargetAvatar, 17, 416, 140, 140)
+            ctx.drawImage(TargetAvatar, 15, 415, 140, 140)
     
             let layout = await 
             Canvas.loadImage("./src/images/jujuba_profile.png")
@@ -76,7 +78,6 @@ module.exports = async (client, interaction, t) => {
             await Utils.renderEmoji(ctx, `${reputation} reps`, 645, 435);
 
             let aboutme = usac ? usac.profile.layout.sobremim : 'A Jujuba é fofa! ,  personalize com /profile aboutme'
-            console.log(aboutme.length)
             
             ctx.textAlign = "left"
             ctx.font = '22px Segoe UI Black';
@@ -105,7 +106,6 @@ module.exports = async (client, interaction, t) => {
   
               for(let i = 0;i < usac.badges.length;i++) {
                 list.push(`${usac.badges[i]}`)
-                console.log(usac.badges[i])
               }
             }
 
@@ -118,12 +118,13 @@ module.exports = async (client, interaction, t) => {
             .replace("HOUSE_BRAVERY", '<:HypeSquadBravery:878201508032827423>')
             .replace("HOUSE_BRILLIANCE", '<:HypeSquadBrilliance:879899227034120253>')
             .replace("HOUSE_BALANCE", '<:HypeSquadBalance:878201328101392394>')
-            .replace("VERIFIED_BOT", '<:verified_bot:886776445106536448>' )
+            .replace("VERIFIED_BOT", '<:emoji_23:989282906834870282>')
             .replace("ADMIN", '<:Javascript:883757487931670598>')
             .replace("TESTES", '<:TCC_IconBugHunterBadge:879901392779739216>')
             .replace("VIP", "<:vipd:904818002988531762>")
             .replace("GRATIAN", "<:gratian:962487783518273536>")
             .replace("CARAMELO", "<:jujuba_wow:981613679843885056>")
+            .replace("BOT_HTTP_INTERACTIONS", "<:svg:1012917259028664390>")
             
             
 
@@ -133,10 +134,10 @@ module.exports = async (client, interaction, t) => {
 
             try {
             const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `profile.jpg`)
-           interaction.editReply({ content: `🇧🇷 **| Profile de ${user.username}**`, files: [attachment]})
+           interaction.editReply({ embeds: [], files: [attachment]})
             
             } catch (err) {
-            return interaction.editReply({ content: `Não consegui montar o perfil do usuário.\n\`\`\`\n${err}\n\`\`\``})
+            return interaction.editReply({ content: `Não consegui montar o perfil do usuário.\n\`\`\`\n${err}\n\`\`\``, embeds: []})
             }
 
         //interaction.editReply({ content: 'este comando esta em desenvolvimento.', ephemeral: true})

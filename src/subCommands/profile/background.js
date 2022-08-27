@@ -1,45 +1,137 @@
 
 const Command = require('../../structures/Command')
-const { MessageAttachment, MessageEmbed, MessageButton } = require('discord.js')
+const { MessageActionRow, MessageEmbed, MessageButton } = require('discord.js')
 const User = require('../../database/Schemas/User')
-const Fundo = require('../../database/Schemas/Fundo')
-const Coins = require('discord-mongo-currency')
-const fs = require('fs')
-const paginationEmbed = require('../../../packages/paginator/pages');
+const Economy = require('../../../packages/economy')
+const p = require('../../../packages/shop')
 
 module.exports = async (client, interaction, t) => {
     const user = await User.findOne({ user: interaction.user.id })
-    let random = Math.floor(Math.random() * 2)
-    const coins = await getUserCoins(interaction.user)
-    if(coins < 30000) return interaction.reply({ embeds: [new MessageEmbed().setDescription('<:pb_rage:1000175213692071977> Você precisa de pelo menos 30 mil caramelos!\n<a:emoji_107:1001442897981345853> **Como eu consigo caramelos?** você pode pegar no `/economy daily` ou comprar em [clique aqui](https://discord.gg/jujuba) ou `/premium buy`').setColor('DARK_VIVID_PINK').setFooter({ text: 'Não compre caramelos de terceiros, fique atento a golpes!'})]})
-    user.profile.layout.background = random;
-    user.save()
+    const coins = await Economy.view(interaction.user)
+    let page = 0
 
-    Coins.deductCoins(interaction.user, '968570313027780638', 30000)
-    const attachment = new MessageAttachment(`./src/images/backgrounds/back_0${random}.jpg`, `teste${random}.jpg`)
-    const embed = new MessageEmbed()
-    .setTitle('Motivation Texts')
-    .setDescription(MotivationTexts())
-    .setColor("#ffa8eb")
-    interaction.reply({ content: 'Background aleatório equipado!', files: [attachment], embeds: [embed] })
+    let embeds = await p.pages()
+
+    const ButtonBuy = new MessageButton()
+    .setLabel('COMPRAR')
+    .setCustomId('buy')
+    .setStyle('SUCCESS')
+    .setEmoji('🛒')
+
+    const ButtonEquip = new MessageButton()
+    .setCustomId('equip')
+    .setStyle('SECONDARY')
+    .setEmoji('📥')
+    .setLabel('EQUIPAR')
+
+    const ButtonVoltar = new MessageButton()
+    .setCustomId('back')
+    .setEmoji('⬅️')
+    .setStyle('PRIMARY')
+    .setDisabled(true)
+
+    const ButtonProximo = new MessageButton()
+    .setCustomId('next')
+    .setEmoji('➡️')
+    .setStyle('PRIMARY')
+
+    if(!embeds[1]) ButtonProximo.setDisabled(true)
+
+    if(coins.normal >= embeds[page].value && !user.profile.backgrounds.includes(embeds[page].image)) {
+        ButtonBuy.setDisabled(false)
+        ButtonEquip.setDisabled(true)
+    } else {
+        ButtonBuy.setDisabled(true)
+        if(user.profile.layout.background !== embeds[page].image) {
+            ButtonEquip.setDisabled(false)
+        } else {
+            ButtonEquip.setDisabled(true)
+        }
     }
 
-    //vou colocar uma embed com textos motivacionais aqui
+    const row = new MessageActionRow().addComponents(ButtonVoltar, ButtonBuy, ButtonEquip, ButtonProximo)
 
-function MotivationTexts () {
-    let array = [
-        'Não se condene pelos seus erros, você está aprendendo a viver. Porém, não se acomode aos erros que comete, busque sempre evoluir diante dos seus aprendizados e do que faz sentido para você. Se conheça e se permita amadurecer com os caminhos percorridos por você.',
-        'Mesmo que essa seja uma fase difícil, você sabe que também irá passar por ela. Você é uma pessoa forte e comprometida a evoluir, dessa forma aprende com a vida até mesmo em momentos ruins. Permita-se sentir a grandeza que existe dentro de você para superar obstáculos.',
-        'O importante na vida não é errar simplesmente para aprender. É também se observar e se tornar um ser desperto e autoconsciente para reconhecer as situações e agir diante delas. Pratique o seu autoconhecimento e desperte o seu olhar para a vida, veja além daquilo que seus olhos alcançam.',
-        'Nâo fique procurando desculpas e nem culpados Seja humilde para reconhcer uma falha. Aprenda com os erros e recomece com mais certeza. O erro é uma forma de ensino poderosa',
+    let msg = await interaction.reply({ embeds: [embeds[0].embed], components: [row], fetchReply: true })
 
-    ]
+    const filter = user => user
 
-    return array[Math.floor(Math.random() * array.length)]
-}
+    const collector = msg.createMessageComponentCollector({ filter: filter, time: 60000})
 
-async function getUserCoins(user) {
-    let coins = await Coins.findUser(user.id, '968570313027780638')
+    collector.on('collect', async (i) => {
+        if(i.user !== interaction.user) return i.reply({ content: 'Você não pode usar isso aqui.', ephemeral: true})
 
-    return coins.coinsInWallet
+        collector.resetTimer()
+
+        if(i.customId === 'next') {
+            page = page + 1
+
+            if(coins.normal >= embeds[page].value && !user.profile.backgrounds.includes(embeds[page].image)) {
+                ButtonBuy.setDisabled(false)
+                ButtonEquip.setDisabled(true)
+            } else {
+                ButtonBuy.setDisabled(true)
+                if(user.profile.layout.background !== embeds[page].image) {
+                    ButtonEquip.setDisabled(false)
+                } else {
+                    ButtonEquip.setDisabled(true)
+                }
+            }
+
+            if(!embeds[page + 1]) {
+                ButtonProximo.setDisabled(true)
+            } else {
+                ButtonProximo.setDisabled(false)
+            }
+
+            if(!embeds[page - 1]) {
+                ButtonVoltar.setDisabled(true)
+            } else {
+                ButtonVoltar.setDisabled(false)
+            }
+
+            i.update({ embeds: [embeds[page].embed], components: [row]})
+        } else if(i.customId === 'back') {
+            page = page - 1
+
+            if(!embeds[page - 1]) {
+                ButtonVoltar.setDisabled(true)
+            } else {
+                ButtonVoltar.setDisabled(false)
+            }
+
+            if(!embeds[page + 1]) {
+                ButtonProximo.setDisabled(true)
+            } else {
+                ButtonProximo.setDisabled(false)
+            }
+
+            if(coins.normal >= embeds[page].value && !user.profile.backgrounds.includes(embeds[page].image)) {
+                ButtonBuy.setDisabled(false)
+                ButtonEquip.setDisabled(true)
+            } else {
+                ButtonBuy.setDisabled(true)
+                if(user.profile.layout.background !== embeds[page].image) {
+                    ButtonEquip.setDisabled(false)
+                } else {
+                    ButtonEquip.setDisabled(true)
+                }
+            }
+
+            i.update({ embeds: [embeds[page].embed], components: [row]}) 
+        } else if(i.customId === 'buy') {
+            if(coins.normal < embeds[page].value) return i.reply({ content: 'Caramelos insuficientes, quer mais caramelos? use `/premium buy`', ephemeral: true})
+
+            await Economy.remove(interaction.user, embeds[page].value)
+            user.profile.backgrounds.push(embeds[page].image)
+            user.save()
+
+            interaction.channel.send({ content: `🛒 | ${interaction.user}, background **${embeds[page].name}** comprado com sucesso!`})
+        } else if(i.customId === 'equip') {
+            if(!user.profile.backgrounds.includes(embeds[page].image)) return i.reply({ content: 'Você não tem esse background!', ephemeral: true})
+            user.profile.layout.background = embeds[page].image;
+            user.save()
+
+            interaction.channel.send({ content: `📥 | ${interaction.user}, background **${embeds[page].name}** equipado com sucesso, use \`/profile view\` para ver ele!`})
+        }
+    })
 }

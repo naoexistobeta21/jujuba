@@ -75,23 +75,6 @@ module.exports = async (client, interaction, t) => {
 
 }
 
-async function getUsersData(user1, user2) {
-    const data1 = await User.findOne({ user: user1 })
-    const data2 = await User.findOne({ user: user2 })
-
-    return {
-        data1,
-        data2
-    }
-}
-
-async function getMarryStatus(user) {
-    const data = await User.findOne({ user: user})
-
-    if(data.profile.marry.status === true) return true
-
-    return false
-}
 
 async function pushMarryForUsers (user, status, marida, time) {
     const data = await User.findOne({ user: user})

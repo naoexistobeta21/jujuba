@@ -5,7 +5,7 @@ registerFont('Segoe UI Black.ttf', { family: 'osvaldo' })
 const db = require('discord-mongo-currency')
 const Utils = require("../../util/Util.js")
 
-module.exports =  async (client, interaction) =>{
+module.exports =  async (client, interaction) => {
     const page = interaction.options.getNumber('page')
     const emb = new Discord.MessageEmbed().setDescription('Montando money top, aguarde...').setColor('DARK_VIVID_PINK')
     await interaction.reply({ embeds: [emb] })

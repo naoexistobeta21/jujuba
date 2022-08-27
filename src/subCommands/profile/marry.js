@@ -1,5 +1,5 @@
 const Command = require('../../structures/Command')
-const bitcoin = require('discord-mongo-currency')
+const bitcoin = require('../../../packages/economy')
 const Utils = require("../../util/Util")
 const Levels = require("discord-xp");
 const { MessageEmbed, MessageButton, MessageActionRow, MessageAttachment } = require('discord.js')
@@ -11,10 +11,10 @@ module.exports = async (client, interaction, t) => {
     const user = interaction.options.getUser('user')
     const data = await User.findOne({ user: interaction.user.id })
     const data2 = await User.findOne({ user: user.id  })
-    const coins1 = await bitcoin.findUser(user.id, '968570313027780638')
-    const coins2 = await bitcoin.findUser(interaction.user.id, '968570313027780638')
+    const coins1 = await bitcoin.view(user)
+    const coins2 = await bitcoin.view(interaction.user)
 
-    if(coins1.coinsInWallet < 7000 || coins2.coinsInWallet < 7000) return interaction.reply({ embeds: [new MessageEmbed().setDescription('Vocês dois precisa ter pelo menos 7,000 caramelos de saldo, quer mais caramelos? use `/premium buy` ou [visite nosso servidor de suporte](https://discord.gg/jujuba) | [link2](https://discord.gg/7fHTb9ukMd)').setColor('DARK_VIVID_PINK').setFooter({ text: 'Taxa de casamento: 14,000 caramelos | taxa diária: 150 caramelos'})]})
+    if(coins1.normal < 7000 || coins2.normal < 7000) return interaction.reply({ embeds: [new MessageEmbed().setDescription('Vocês dois precisa ter pelo menos 7,000 caramelos de saldo, quer mais caramelos? use `/premium buy` ou [visite nosso servidor de suporte](https://discord.gg/jujuba) | [link2](https://discord.gg/7fHTb9ukMd)').setColor('DARK_VIVID_PINK').setFooter({ text: 'Taxa de casamento: 14,000 caramelos | taxa diária: 150 caramelos'})]})
 
     let embedError = new MessageEmbed()
     .setTitle('Usuário não registrado na database!')
@@ -66,8 +66,8 @@ module.exports = async (client, interaction, t) => {
             await pushMarryForUsers(user.id, 'casado', interaction.user.id, Date.now())
             await pushMarryForUsers(interaction.user.id, 'casado', user.id, Date.now())
 
-            await bitcoin.deductCoins(user.id, '968570313027780638', 7000)
-            await bitcoin.deductCoins(interaction.user.id, '968570313027780638', 7000)
+            await bitcoin.remove(user,7000)
+            await bitcoin.remove(interaction.user, 7000)
             const row2 = new MessageActionRow().addComponents(button3, button4)
             let embedWow = new MessageEmbed()
             .setTitle('Felicidades ao Casal!')
@@ -97,9 +97,9 @@ module.exports = async (client, interaction, t) => {
             presentes++
             if(coinswakket < 1000) return i.reply({ content: 'Você precisa ter 1000 caramelos antes de dar presente aos casad@s!', ephemeral: true})
 
-            await bitcoin.giveCoins(interaction.user.id, '968570313027780638', 500)
-            await bitcoin.giveCoins(user.id, '968570313027780638', 500)
-            await bitcoin.deductCoins(i.user.id, '968570313027780638', 1000)
+            await bitcoin.add(interaction.user, 500)
+            await bitcoin.add(user, 500)
+            await bitcoin.remove(i.user, 1000)
 
             jadeupresente.push(i.user.id)
 
@@ -109,23 +109,6 @@ module.exports = async (client, interaction, t) => {
 
 }
 
-async function getUsersData(user1, user2) {
-    const data1 = await User.findOne({ user: user1 })
-    const data2 = await User.findOne({ user: user2 })
-
-    return {
-        data1,
-        data2
-    }
-}
-
-async function getMarryStatus(user) {
-    const data = await User.findOne({ user: user})
-
-    if(data.profile.marry.status === true) return true
-
-    return false
-}
 
 async function pushMarryForUsers (user, status, marida, time) {
     const data = await User.findOne({ user: user})
