@@ -7,12 +7,15 @@ module.exports = class extends Command {
     constructor(client) {
         super(client, {
             name: 'server',
-            description: '[ 🌐 SERVER ] - Veja informações sobre servidor atual',
+            name_localizations: {"pt-BR": "servidor"},
+            description: '[ 🌐 SERVER ] - View current server information', 
+            description_localizations: {"pt-BR":"[ 🌐 SERVER ] - Veja informações sobre servidor atual"},
             options: [
                 {
                     type: 'SUB_COMMAND',
                     name: 'info',
-                    description: '[ 🌐 SERVER ] - Veja as informações do seu servidor'
+                    description: '[ 🌐 SERVER ] - View current server information',
+                    description_localizations: {"pt-BR":"[ 🌐 SERVER ] - Veja informações sobre servidor atual"}
                 }
             ]
         })
@@ -39,7 +42,7 @@ module.exports = class extends Command {
             const row = new Discord.MessageActionRow().addComponents(button)
             let roles = await getRoles(interaction.guild)
             let embed = new Discord.MessageEmbed()
-            .setTitle(`${this.client.ws.ping}ms - ${interaction.guild.name}`)
+            .setTitle(`${~~(this.client.ws.ping)}ms - ${interaction.guild.name}`)
             .setThumbnail(interaction.guild.iconURL())
             .setColor('DARK_VIVID_PINK')
             .setImage(interaction.guild.bannerURL({ size: 1024 }))
@@ -51,11 +54,11 @@ module.exports = class extends Command {
                 },
                 {
                 name: '💻 Shard ID',
-                value: `${interaction.guild.shardId} - Jujuba\nCluster ${this.client.cluster.id} (\`online\`) `,
+                value: `${interaction.guild.shardId} - Jujuba Cluster ${this.client.cluster.id} (\`online\`) `,
                 inline: true
             },
             {
-                name: '<:server_owner:1002991941081907280> Dono',
+                name: `<:server_owner:1002991941081907280> ${t('commands:server.owner')}`,
                 value: `\`${this.client.users.cache.get(interaction.guild.ownerId).tag}\` (${interaction.guild.ownerId})`,
                 inline: true
             },
@@ -65,22 +68,22 @@ module.exports = class extends Command {
                 inline: true
             },
             {
-                name: `<:members1:1002960272484470844> Membros (${interaction.guild.memberCount})`,
+                name: `<:members1:1002960272484470844> ${t('commands:server.members')} (${interaction.guild.memberCount})`,
                 value: `🤖 **Bots (${bots})**`,
                 inline: true
             },
             {
-                name: `<:Icon_ChannelText:1002966100989980702> Canais (${interaction.guild.channels.cache.size})`,
-                value: `<:voice:1002967057186422825> **Voz (${interaction.guild.channels.cache.filter(channel => channel.type === 'GUILD_VOICE').size})**\n<:dpc_CanalTexto:1002967553578115072> **Texto (${interaction.guild.channels.cache.filter(channel => channel.type === 'GUILD_TEXT').size})**`,
+                name: `<:Icon_ChannelText:1002966100989980702> ${t('commands:server.channels')} (${interaction.guild.channels.cache.size})`,
+                value: `<:voice:1002967057186422825> **${t('commands:server.voice')} (${interaction.guild.channels.cache.filter(channel => channel.type === 'GUILD_VOICE').size})**\n<:dpc_CanalTexto:1002967553578115072> **${t('commands:server.text')} (${interaction.guild.channels.cache.filter(channel => channel.type === 'GUILD_TEXT').size})**`,
                 inline: true
             },
             {
-                name: '<:LNE_verde_join:1002991681542565989> Entrei aqui',
+                name: `<:LNE_verde_join:1002991681542565989> ${t('commands:server.entermy')}`,
                 value: `<t:${~~(sus.joinedTimestamp / 1000)}> (<t:${~~(sus.joinedTimestamp / 1000)}:R>)`,
                 inline: true
             },
             {
-                name: '<:channelcreated:1002992123429273800> Criado em',
+                name: `<:channelcreated:1002992123429273800> ${t('commands:server.created')}`,
                 value: `<t:${~~(interaction.guild.createdAt / 1000)}> (<t:${~~(interaction.guild.createdAt / 1000)}:R>)`,
                 inline: true
             }
@@ -88,7 +91,7 @@ module.exports = class extends Command {
 
             //\n**Booster's:** 
 
-            let msg = await interaction.reply({ components: [row], embeds: [embed], fetchReply: true})
+            let msg = await interaction.reply({ components: [row], embeds: [embed], fetchReply: true, ephemeral: true})
 
             let filter = user => user
             const collector = msg.createMessageComponentCollector({ filter: filter, time: 120000})
@@ -96,7 +99,7 @@ module.exports = class extends Command {
             collector.on('collect', (i) => {
                 if(i.customId === 'roles') {
                     let embed = new Discord.MessageEmbed()
-                .setTitle("Cargos Filosóficos")
+                .setTitle(`${t('buttons:info.rolespp')}`)
                 .setDescription(`${roles}`)
                 .setColor('DARK_VIVID_PINK')
 

@@ -1,7 +1,9 @@
 const Event = require('../../structures/Event')
 const c = require('colors')
-const { AdventureTime } = require('../../../games/adventureTime')
-const { Player } = require('../../../games/players')
+const { Client } = require("cherry-payments");
+const config = require('../../../config.json')
+const a = require('../../../packages/banEmbed')
+const Guild = require('../../database/Schemas/Guild')
 module.exports = class extends Event {
     constructor(client) {
         super(client, {
@@ -12,30 +14,47 @@ module.exports = class extends Event {
     run = async () => {
         this.client.registryCommands()
         this.client.user.setStatus("online")
-        
+
         const dbIndex = require("../../database/index");
         dbIndex.start();
 
-        this.client.guilds.cache.forEach((guild) => {
-            this.client.user.setActivity(`Adventure Time! Cluster ${this.client.cluster.id} [${guild.shardId}]`, { type: "PLAYING", shardId: guild.shardId }) 
+        this.client.guilds.cache.forEach(async (guild) => {
+            this.client.user.setActivity(`Adventure Time! Cluster ${this.client.cluster.id} [${guild.shardId}]`, { type: "PLAYING", shardId: guild.shardId })
+
+            let data = await Guild.findOne({ server: guild.id })
+                if(data) {
+                if(data.games.akinator.status === true) {
+                    console.log(`Role all do servidor ${guild.name} (${guild.id}) foi resetado!`)
+                    data.games.akinator.status = false
+                    data.save().catch(() => {})
+                }
+                }
         })
 
         setInterval(() => {
             this.client.guilds.cache.forEach((guild) => {
-                this.client.user.setActivity(`Adventure Time! Cluster ${this.client.cluster.id} [${guild.shardId}]`, { type: "PLAYING", shardId: guild.shardId }) 
+                this.client.user.setActivity(`Adventure Time! Cluster ${this.client.cluster.id} [${guild.shardId}]`, { type: "PLAYING", shardId: guild.shardId })
             })
         }, 20 * 60000)
-/*
-        let players = []
-        let channel = this.client.channels.cache.get('1003321650307153960')
-        
+
+        /*
+
+        let channel = this.client.channels.cache.get('1015100170796539964')
+
+        let banido = {
+            id: "389089969911889920",
+            username: 'konima'
+        }
+        let staff = {
+            id: "947856944515936306",
+            username: 'ᵠᵈʷBonnibel#8382' 
+        }
+        const embedss = a.ban(banido, staff, 1000, `Uso de programas de terceiros para obter vantagens no /economy`, 'permanente')
+
         if(channel) {
-            this.client.adv = new AdventureTime(players, channel)
-            await this.client.adv.start(channel)
-            setInterval(async () => {
-                await this.client.adv.next(channel)
-                await this.client.adv.start(channel)
-            }, 60000 * 18) //1080000
-        }*/
+            channel.send({ embeds: [embedss]})
+        }
+        */
+
     }
 }

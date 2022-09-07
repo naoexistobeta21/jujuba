@@ -17,6 +17,8 @@ module.exports = class extends Client {
 
     
 
+    
+
     registryCommands() {
         this.application.commands.set(this.commands)
     }

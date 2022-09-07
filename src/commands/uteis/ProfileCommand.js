@@ -10,13 +10,17 @@ module.exports = class extends Command {
     constructor(client) {
         super(client, {
             name: 'profile',
-            description: '[✨ PROFILE ] Veja as informações do profile.',
+            name_localizations: {"pt-BR": "perfil"},
+            description: '[✨ PROFILE ] View profile information.',
+            description_localizations: {"pt-BR": "[✨ PROFILE ] Veja as informações do profile"},
             options: [
                 {
                     
                     type: 'SUB_COMMAND',
                     name: 'view',
-                    description: '[✨ PROFILE ] Veja o profile dos usuários.',
+                    name_localizations: {"pt-BR": "ver"},
+                    description: '[✨ PROFILE ] See user profile.',
+                    description_localizations: {"pt-BR": "[✨ PROFILE ] See user profile."},
                     options: [
                         {
                             type: 'USER',
@@ -30,7 +34,9 @@ module.exports = class extends Command {
                     
             type: 'SUB_COMMAND',
             name: 'aboutme',
-            description: '[✨ PROFILE ] Mude sua descrição!',
+            name_localizations: {"pt-BR": "sobremim"},
+            description: '[✨ PROFILE ] change your about me!',
+            description_localizations: {"pt-BR": "[✨ PROFILE ] - Mude seu sobre mim"},
             options: [
                 {
                     type: 'STRING',
@@ -41,35 +47,19 @@ module.exports = class extends Command {
             ]
 },
 {
-    type: 'SUB_COMMAND',
-    name: 'reputation',
-    description: '[✨ PROFILE ] Agradeça aos seus amigos!',
-    options: [
-        {
-            type: 'USER',
-            name: 'user',
-            description: 'Agradeça alguém pelo seu esfoço!',
-            required: true
-        },
-        {
-            type: 'STRING',
-            name: 'text',
-            description: 'Envie um textinho bunitinho para ele <3',
-            required: false
-        }
-    ]
-},
-{
                     
     type: 'SUB_COMMAND',
     name: 'background',
-    description: '[✨ PROFILE ] edit/buy seus backgrounds!',
+    description: '[✨ PROFILE ] edit/buy your backgrounds!',
+    description_localizations: {"pt-BR":"[✨ PROFILE ] edit/buy seus backgrounds"}
 },
 {
                     
     type: 'SUB_COMMAND',
     name: 'marry',
-    description: '[✨ PROFILE ] Case com seu crush, ou seja rejeitad@',
+    name_localizations: {"pt-BR": "casar"},
+    description: '[✨ PROFILE ] Marry your crush, or get rejected',
+    description_localizations: {"pt-BR": "[✨ PROFILE ] Case com seu crush, ou seja rejeitado"},
     options: [
         {
             type: 'USER',
@@ -83,14 +73,16 @@ module.exports = class extends Command {
                     
     type: 'SUB_COMMAND',
     name: 'divorce',
-    description: '[✨ PROFILE ] Divorcie um amor que não deu certo',
+    name_localizations: {"pt-BR": "divorciar"},
+    description: '[✨ PROFILE ] Divorce a love that didn\'t work out',
+    description_localizations: {"pt-BR": "[✨ PROFILE ] Divorcie um amor que não deu certo"}
 }
             ]
         })
     }
 
-    run = async (interaction) => {
+    run = async (interaction, t) => {
         const subCommand = interaction.options.getSubcommand()
-        require(`../../subCommands/profile/${subCommand}`)(this.client, interaction)
+        require(`../../subCommands/profile/${subCommand}`)(this.client, interaction, t)
     }
 }

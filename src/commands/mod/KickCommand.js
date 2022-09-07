@@ -12,7 +12,11 @@ module.exports = class extends Command {
     constructor(client) {
         super(client, {
             name: 'kick',
-            description: '[ ⚙️ MOD ] Expulsar algum usuário?',
+            name_localizations: {"pt-BR":"expulsar"},
+            userPerms: ["KICK_MEMBERS"],
+            botPerms: ["KICK_MEMBERS"],
+            description: '[ ⚙️ MOD ] Kick bad users!',
+            description_localizations: {"pt-BR":"[ ⚙️ MOD ] chute usuários ruins!"},
             options: [
                 {
                     type: 'USER',
@@ -22,7 +26,7 @@ module.exports = class extends Command {
                 },
                 {
                     type: 'STRING',
-                    name: 'motive',
+                    name: 'reason',
                     description: 'Qual é o motivo?',
                     required: false
                 }
@@ -32,31 +36,29 @@ module.exports = class extends Command {
         )
     }
 
-    run = async (interaction) => {
-        if(!interaction.member.permissions.has('KICK_MEMBERS')) return interaction.reply({ content: 'Você não pode expulsar ninguém...', ephemeral: true})
+    run = async (interaction, t) => {
         const user = interaction.options.getMember('user')
-        console.log(user)
-        const motive = interaction.options.getString('motive') || 'Nenhum motivo inserido'
-        if(user.id === interaction.user.id) return interaction.reply({ content: 'Você não pode expulsar você mesmo bobinho!', ephemeral: true})
-        if (user.roles.highest.position >= interaction.member.roles.highest.position && interaction.guild.ownerId !== interaction.user.id) return interaction.reply({ content: 'Você não pode expulsar membros com cargos maior que o seu!', ephemeral: true})
-        if (interaction.guild.me.roles.highest.position <= user.roles.highest.position) return interaction.reply({ content: 'Eu não consigo expulsar este membro, meu cargo não é tão superior quanto o dele.', ephemeral: true })
+        const motive = interaction.options.getString('reason') || `${t('commands:punishiment.reason')}`
+        if(user.id === interaction.user.id) return interaction.reply({ content: `${t('commands:punishiment.self')}`, ephemeral: true})
+        if (user.roles.highest.position >= interaction.member.roles.highest.position && interaction.guild.ownerId !== interaction.user.id) return interaction.reply({ content: `${t('commands:punishiment.high')}`, ephemeral: true})
+        if (interaction.guild.me.roles.highest.position <= user.roles.highest.position) return interaction.reply({ content: `${t('commands:punishiment.highbot')}`, ephemeral: true })
 
         const guild = await Guild.findOne({ server: interaction.guild.id})
         //button
-        const button = new Discord.MessageButton().setStyle('PRIMARY').setLabel('Confirmar punição').setCustomId('confirm')
+        const button = new Discord.MessageButton().setStyle('PRIMARY').setLabel(`${t('buttons:punishiment.confirm')}`).setCustomId('confirm')
         const row = new Discord.MessageActionRow().addComponents(button)
-        let msg = await interaction.reply({ content: `<:bmo_howdy:1000167902126805042> | Você está prestes a expulsar ${user} do seu servidor pelo motivo **${motive}**!`, components: [row], fetchReply: true})
+        let msg = await interaction.reply({ content: `${t('commands:punishiment.confirm', {user: user, motive: motive})}`, components: [row], fetchReply: true})
 
         const filter = user => user
         const collector = msg.createMessageComponentCollector({ filter: filter, time: 120000})
 
         collector.on('collect', async (i) => {
-            if(i.user !== interaction.user) return i.reply({ content: 'Você não pode usar isto, saia daqui!', ephemeral: true})
+            if(i.user !== interaction.user) return i.reply({ content: `${t('errors:noperm.button')}`, ephemeral: true})
             await user.kick({ reason: motive})
-            i.update({ content: 'Usuário punido com sucesso, quem manda quebrar as regras!', components: []})
+            i.update({ content: `${t('commands:punishiment.ok')}`, components: []})
             
-            const log = new AuditLOG(guild, this.client, interaction.guild)
-            log.send({title: 'Membro expulso', description: `**__Nome:__** ${user.username} (${user.id})\n**__Staff:__** ${interaction.user.username} (${interaction.user.tag})\n**__Motivo:__** ${motive}`, color: 'RED'})
+            //const log = new AuditLOG(guild, this.client, interaction.guild)
+            //log.send({title: 'Membro banido', description: `**__Nome:__** ${user.username} (${user.id})\n**__Staff:__** ${interaction.user.username} (${interaction.user.tag})\n**__Motivo:__** ${motive}`, color: 'RED'})
         })
         
     }

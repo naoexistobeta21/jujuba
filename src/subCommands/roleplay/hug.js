@@ -1,48 +1,43 @@
 const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js')
-const t = require('./functions/gifs.js')
-module.exports = async (client, interaction) => {
-    const user = interaction.options.getUser('usuário')
+const ta = require('./functions/gifs.js')
+module.exports = async (client, interaction, t) => {
+    const user = interaction.options.getUser('user')
 
-    if(user.bot) return interaction.reply({ content: 'um bot não tem sentimentos', ephemeral: true})
-    if(user.id === interaction.user.id) return interaction.reply({ content: 'Ta carente? compra um hamister.', ephemeral: true})
-
-    let images = [
-        "https://uploads.spiritfanfiction.com/historias/capitulos/201812/my-sweet-protection-15029395-021220180037.gif",
-    ]
+    if(user.bot) return interaction.reply({ content: `${t('errors:userbot')}`, ephemeral: true})
+    if(user.id === interaction.user.id) return interaction.reply({ content: `${t('errors:my')}`, ephemeral: true})
 
     const button = new MessageButton()
-        .setCustomId(`hug${user.id}`)
-        .setLabel('Retribuir')
+        .setCustomId(`dance${user.id}`)
+        .setLabel(`${t('buttons:roleplay.return')}`)
         .setStyle('PRIMARY')
         .setEmoji('<:jujuba_retribuir:977839544013561896>')
 
     const row = new MessageActionRow().addComponents(button)
 
-    let responseImage = await t.hug()
+    let responseImage = await ta.hug()
     const embed = new MessageEmbed()
-    .setDescription(`<a:jujuba_dance:977848862331011072> **| ${interaction.user} abraçou ${user}!**`)
+    .setDescription(`<a:jujuba_dance:977848862331011072> **| ${interaction.user} ${t('commands:roleplay.hug')} ${user}!**`)
     .setImage(responseImage)
     .setColor('#ED02B2')
-    interaction.reply({ content: `${user}`, embeds: [embed], components: [row] })
+    let msg = await interaction.reply({ embeds: [embed], components: [row], fetchReply: true})
 
     const filter = i => i.user.id === i.user.id;
-         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 120000 });
+         const collector = msg.createMessageComponentCollector({ filter, time: 120000 });
 
 collector.on('collect', async i => {
-    if(i.user.id !== user.id) return i.reply({ content: 'Você não pode usar esse botão!', ephemeral: true})
+    if(i.user.id !== user.id) return i.reply({ content: `${t('errors:noperm.button')}`, ephemeral: true})
     
-	if (i.customId === `hug${user.id}`) {
-        let response = images[Math.floor(Math.random() * images.length)]
+	if (i.customId === `dance${user.id}`) {
+        let response = await ta.hug()
         const embed = new MessageEmbed()
-    .setDescription(`<a:jujuba_dance:977848862331011072> **| ${user} retribuiu o abraço de ${interaction.user}!**`)
+    .setDescription(`<a:jujuba_dance:977848862331011072> **| ${user} ${t('commands:roleplay.hug')} ${interaction.user}!**`)
     .setImage(response)
     .setColor('#ED02B2')
-    i.reply({ content: `${interaction.user}`, embeds: [embed], components: [] })
-    interaction.editReply({ components: [] })
+    i.reply({ embeds: [embed], components: [] })
+    interaction.editReply({ components: [] }).catch((err) => {})
 
 	}
 });
 
-collector.on('end', collected => {});
      
 }

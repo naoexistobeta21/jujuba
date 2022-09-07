@@ -10,11 +10,13 @@ module.exports = class extends Command {
                     
                             type: 'SUB_COMMAND',
                             name: 'kiss',
-                            description: '[ 😂 DIVERSAO ] Beije seu crush ou roube um beijo.',
+                            name_localizations: {"pt-BR": "beijar"},
+                            description: '[ 😂 FUN ] Kiss your crush or steal a kiss.',
+                            description_localizations: {"pt-BR": "[ 😂 FUN ] Beije seu crush ou roube um beijo."},
                             options: [
                                 {
                                     type: 'USER',
-                                    name: 'usuário',
+                                    name: 'user',
                                     description: 'Usuário que você vai beijar.',
                                     required: true
                                 }
@@ -24,11 +26,13 @@ module.exports = class extends Command {
                     
                     type: 'SUB_COMMAND',
                     name: 'dance',
-                    description: '[ 😂 DIVERSAO ] Arrase no baile com usuários!',
+                    name_localizations: {"pt-BR": "dancar"},
+                    description: '[ 😂 FUN ] dance with your friends',
+                    description_localizations: {"pt-BR": "[ 😂 FUN ] Dance com seus amigos "},
                     options: [
                         {
                             type: 'USER',
-                            name: 'usuário',
+                            name: 'user',
                             description: 'Usuário que você vai dançar.',
                             required: true
                         }
@@ -38,11 +42,13 @@ module.exports = class extends Command {
                     
             type: 'SUB_COMMAND',
             name: 'hug',
-            description: '[ 😂 DIVERSAO ] Abrace um usuário que está carente.',
+            name_localizations: {"pt-BR": "abracar"},
+            description: '[ 😂 FUN ] Hug a user who is needy.',
+            description_localizations: {"pt-BR": "[ 😂 FUN ] Abrace um usuário carente"},
             options: [
                 {
                     type: 'USER',
-                    name: 'usuário',
+                    name: 'user',
                     description: 'Usuário que você vai abraçar.',
                     required: true
                 }
@@ -52,11 +58,13 @@ module.exports = class extends Command {
                     
     type: 'SUB_COMMAND',
     name: 'slap',
-    description: '[ 😂 DIVERSAO ] Dê tapa em um usuário.',
+    name_localizations: {"pt-BR": "bater"},
+    description: '[ 😂 FUN ] Slap a user.',
+    description_localizations: {"pt-BR": "[ 😂 FUN ] Dê um tapa em um usuário"},
     options: [
         {
             type: 'USER',
-            name: 'usuário',
+            name: 'user',
             description: 'Usuário que você vai bater.',
             required: true
         }
@@ -66,9 +74,9 @@ module.exports = class extends Command {
         })
     }
 
-    run = (interaction) => {
+    run = (interaction, t) => {
         const subCommand = interaction.options.getSubcommand()
 
-        require(`../../subCommands/roleplay/${subCommand}`)(this.client, interaction)
+        require(`../../subCommands/roleplay/${subCommand}`)(this.client, interaction, t)
     }
 }

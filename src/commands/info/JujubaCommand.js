@@ -14,11 +14,12 @@ module.exports = class extends Command {
     constructor(client) {
         super(client, {
             name: 'jujuba',
-            description: '[ ❓ INFO ] - Veja tudo sobre mim.'
+            description: '[ ❓ INFO ] - See my information.',
+            description_localizations: {"pt-BR":"[ ❓ INFO ] - Veja tudo sobre mim"}
         })
     }
 
-    run = async (interaction) => {
+    run = async (interaction, t) => {
         //interaction.channel.sendTyping()
         let gg = 0
         let gg2 = 0
@@ -38,26 +39,26 @@ module.exports = class extends Command {
 
         let totalGuilds = gg ? gg : 0
         const cliente = this.client.readyAt
+        const cei = this.client
         const users = gg2 ? gg2 : 0
         const channels = gg3 ? gg3 : 0
         const ping = this.client.ws.ping
         const svc = os.platform()
         const cpuS = `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / 16GB`
           cpuStat.usagePercent(function (err, percent, seconds) {
-              const duration = moment.duration(cliente).format("D [dias], H [horas], m [minutos], s [segundos]").replace('minsutos', 'minutos')
               const button = new Discord.MessageButton()
-              .setLabel('Comunidade')
+              .setLabel('Servidor de suporte')
               .setStyle('LINK')
               .setURL('https://discord.gg/FvXJ3vbKaD')
               
               const button2 = new Discord.MessageButton()
-              .setLabel('Convidar')
+              .setLabel('Me adicione')
               .setStyle('LINK')
               .setURL('https://discord.com/api/oauth2/authorize?client_id=970134090152034354&permissions=671399942&scope=bot%20applications.commands')
               
               
               const button4 = new Discord.MessageButton()
-              .setLabel('GitHub - nãoexisto')
+              .setLabel('Source code')
               .setStyle('LINK')
               .setURL('https://github.com/naoexistobb')
               
@@ -66,12 +67,15 @@ module.exports = class extends Command {
               .setStyle('LINK')
               .setURL('https://jujuba.website/')
               .setDisabled(true)
-        const row = new Discord.MessageActionRow().addComponents(button, button2, button4)
+
+              let created = ~~(cei.user.createdAt / 1000)
+        const row = new Discord.MessageActionRow().addComponents(button2, button, button4)
               const embed = new Discord.MessageEmbed()
-              .setTitle('Olá, eu me chamo Jujuba!')
-              .setDescription(`Olá, eu me chamo jujuba (meus amigos próximos me chamam de "Ju"), tenho 17 anos e, estou em busca de deixar seu servidor unico e extraordinário!\n\nAtualmente estou espalhando alegria em **${totalGuilds} servidores**, cuidando de **${users} usuários**, supervisionando **${channels} canais**.\n\nOnline desde **<t:${Math.floor(cliente / 1000)}>**, usando aproximadamente **${cpuS} memória ram**, hospedada na **Gratian host**, com servidor dedicado **${svc}**, meu ping é **${Math.round(ping)}ms**, estou usando **${Math.round(percent)}%** da cpu`)
+              .setAuthor({ name: `${t('commands:jujuba.title')}`, iconURL: cei.user.displayAvatarURL({ size: 128})})
+              .setDescription(`${t('commands:jujuba.desc', { users: users, guilds: totalGuilds, created: created})}`)
               .setColor('#F549EF')
-              .setImage('https://cdn.discordapp.com/attachments/1002333100744912977/1002333890192625785/a-1.gif')
+              .setFooter({ iconURL: cei.users.cache.get('947856944515936306').displayAvatarURL({ size: 128}), text: `by ${cei.users.cache.get('947856944515936306').tag}`})
+              .setThumbnail(cei.user.displayAvatarURL({ size: 128}))
               
               interaction.reply({embeds: [embed], components: [row]})
           })

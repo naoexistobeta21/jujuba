@@ -15,4 +15,3 @@ manager.on('clusterCreate', (cluster) => {
   console.log(`Cluster ${cluster.id} iniciado`)
 });
 manager.spawn({ timeout: -1 });
-
