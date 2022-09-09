@@ -1,104 +1,112 @@
-const { Client } = require('discord.js')
+"use strict"
 
-const { readdirSync } = require('fs')
-const { join } = require('path')
-const Locale = require('../../packages/Locale')
-const Guild = require('../database/Schemas/Guild')
+import { Client as Base } from "discord.js"
+import { join } from "path"
+import { readdirSync } from "fs"
+import { Guild, Locale } from "../imports"
 
-module.exports = class extends Client {
-    constructor(options) {
-        super(options)
+//const Locale = require('../../packages/Locale')
+//import { Guild } from "../database/Schemas/Guild"
 
-        this.commands = []
-        this.logs = []
-        this.loadCommands()
-        this.loadEvents()
-    }
+export default class Client extends Base {
+  constructor(opt) {
+    super(opt)
+    this.commands = []
+    this.logs = []
+    this.#loadCommands()
+    this.#loadEvents()
 
-    
+  }
 
-    
+  registryCommands() {
+    this.application.commands.set(this.commands)
+  }
 
-    registryCommands() {
-        this.application.commands.set(this.commands)
-    }
+  #loadEvents(path = "src/commands") {
+    const categories = readdirSync(path)
 
+    for (const category of categories) {
+      const events = readdirSync(`${path}/${category}`)
 
+      for (const event of events) {
+        (async () => {
 
-    loadCommands(path = 'src/commands') {
-        const categories = readdirSync(path)
+          let eventClass = require(join(process.cwd(), `${path}/${category}/${event}`))
+          let evt = new eventClass.default(this)
 
-        for (const category of categories) {
-            const commands = readdirSync(`${path}/${category}`)
+          this.on(evt.name, evt.run)
+        })()
 
-            for (const command of commands) {
-                const commandClass = require(join(process.cwd(), `${path}/${category}/${command}`))
-                const cmd = new (commandClass)(this)
-
-                this.commands.push(cmd)
-            }
-        }
-    }
-    loadEvents(path = 'src/events') {
-        const categories = readdirSync(path)
-
-        for (const category of categories) {
-            const events = readdirSync(`${path}/${category}`)
-
-            for (const event of events) {
-                const eventClass = require(join(process.cwd(), `${path}/${category}/${event}`))
-                const evt = new (eventClass)(this)
-
-                this.on(evt.name, evt.run)
-            }
-        }
-    }
-
-    async getLanguage(firstGuild) {
-        if (!firstGuild) return;
-        const guild = await Guild.findOne({
-          server: firstGuild,
-        });
-    
-        if (guild) {
-          let lang = guild.botconfig.language;
-    
-          if (lang === undefined) {
-            guild.botconfig.language = "portuguese";
-            guild.save();
-    
-            return "portuguese";
-          } else {
-            return lang;
-          }
-        } else {
-          await Guild.create({ server: firstGuild });
-    
-          return "portuguese";
-        }
       }
-    
-      async getActualLocale() {
-        return this.t;
-      }
-    
-      async setActualLocale(locale) {
-        this.t = locale;
-      }
-    
-      async getTranslate(guild) {
-        const language = await this.getLanguage(guild);
-    
-        const translate = new Locale("src/languages");
-    
-        const t = await translate.init({
-          returnUndefined: false,
-        });
-    
-        translate.setLang(language);
-    
-        return t;
-      }
-
     }
-    
+
+  }
+
+  /**
+   * @param {Path} path
+   */
+
+  #loadCommands(path = "src/commands") {
+    const categories = readdirSync(path)
+
+    for (const category of categories) {
+      const commands = readdirSync(`${path}/${category}`)
+
+      for (const command of commands) {
+        (async () => {
+
+          let commandClass = await import(join(process.cwd(), `${path}/${category}/${command}`))
+          let cmd = new commandClass.default(this)
+
+          this.commands.push(cmd)
+        })()
+      }
+    }
+  }
+
+  async getLanguage(firstGuild) {
+    if (!firstGuild) return;
+    const guild = await Guild.findOne({
+      server: firstGuild,
+    });
+
+    if (guild) {
+      let lang = guild.botconfig.language;
+
+      if (lang === undefined) {
+        guild.botconfig.language = "portuguese";
+        guild.save();
+
+        return "portuguese";
+      } else {
+        return lang;
+      }
+    } else {
+      await Guild.create({ server: firstGuild });
+
+      return "portuguese";
+    }
+  }
+
+  async getActualLocale() {
+    return this.t;
+  }
+
+  async setActualLocale(locale) {
+    this.t = locale;
+  }
+
+  async getTranslate(guild) {
+    const language = await this.getLanguage(guild);
+
+    const translate = new Locale("src/languages");
+
+    const t = await translate.init({
+      returnUndefined: false,
+    });
+
+    translate.setLang(language);
+
+    return t;
+  }
+}
